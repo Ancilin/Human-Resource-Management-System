@@ -37,6 +37,14 @@ const mockEmpUser = {
   }
 };
 
+const mockHRLeavesList = [
+  { id: 201, employee_name: 'Vikram Singh', employee_code: 'EMP-SLS-055', department: 'Sales', leave_type: 'Sick Leave', start_date: '2026-07-22', end_date: '2026-07-23', days_count: 2, reason: 'High fever and doctor consultation', status: 'Pending', applied_at: '2026-07-21', review_notes: '' },
+  { id: 202, employee_name: 'Neha Kapoor', employee_code: 'EMP-MKT-011', department: 'Marketing', leave_type: 'Casual Leave', start_date: '2026-07-25', end_date: '2026-07-26', days_count: 2, reason: 'Family function trip', status: 'Approved', applied_at: '2026-07-20', review_notes: 'Approved. Enjoy your time off.' },
+  { id: 203, employee_name: 'Rahul Verma', employee_code: 'EMP-DES-012', department: 'Product & Design', leave_type: 'Paid Leave', start_date: '2026-08-01', end_date: '2026-08-05', days_count: 5, reason: 'Annual vacation trip', status: 'Pending', applied_at: '2026-07-22', review_notes: '' },
+  { id: 204, employee_name: 'Priya Sharma', employee_code: 'EMP-ENG-042', department: 'Engineering', leave_type: 'Casual Leave', start_date: '2026-06-10', end_date: '2026-06-11', days_count: 2, reason: 'Personal work', status: 'Approved', applied_at: '2026-06-08', review_notes: 'Approved by HR.' },
+  { id: 205, employee_name: 'David Miller', employee_code: 'EMP-FIN-033', department: 'Finance', leave_type: 'Unpaid Leave', start_date: '2026-07-15', end_date: '2026-07-16', days_count: 2, reason: 'Shortage of leave quota', status: 'Rejected', applied_at: '2026-07-12', review_notes: 'Rejected due to month-end financial audit deadlines.' }
+];
+
 const mockHRDashboardData = {
   metrics: {
     totalEmployees: 42,
@@ -50,10 +58,7 @@ const mockHRDashboardData = {
     { id: 103, employee_name: 'Ananya Patel', department: 'Marketing', check_in: '09:15 AM', check_out: null, status: 'Present', date: '2026-07-22', employee_code: 'EMP-MKT-009', total_hours: 7.5 },
     { id: 104, employee_name: 'Vikram Singh', department: 'Sales', check_in: '--:--', check_out: '--:--', status: 'On Leave', date: '2026-07-22', employee_code: 'EMP-SLS-055', total_hours: 0 }
   ],
-  recentLeaves: [
-    { id: 201, employee_name: 'Vikram Singh', employee_code: 'EMP-SLS-055', department: 'Sales', leave_type: 'Sick Leave', start_date: '2026-07-22', end_date: '2026-07-23', days_count: 2, reason: 'High fever and doctor consultation', status: 'Pending', applied_at: '2026-07-21' },
-    { id: 202, employee_name: 'Neha Kapoor', employee_code: 'EMP-MKT-011', department: 'Marketing', leave_type: 'Casual Leave', start_date: '2026-07-25', end_date: '2026-07-26', days_count: 2, reason: 'Family function trip', status: 'Approved', applied_at: '2026-07-20' }
-  ]
+  recentLeaves: mockHRLeavesList
 };
 
 const mockEmpDashboardData = {
@@ -137,7 +142,7 @@ async function request(endpoint, options = {}) {
   } catch (error) {
     console.warn(`API endpoint ${endpoint} live fallback mode activated:`, error.message);
 
-    // MOCK FALLBACK HANDLERS FOR LIVE VERCEL DEMO (FORMATTED EXACTLY LIKE EXPRESS API)
+    // MOCK FALLBACK HANDLERS FOR LIVE VERCEL DEMO
     if (endpoint === '/auth/login') {
       let body = {};
       try { body = JSON.parse(options.body || '{}'); } catch (e) {}
@@ -174,8 +179,24 @@ async function request(endpoint, options = {}) {
       return { leaves: mockEmpDashboardData.myLeaves, stats: mockEmpDashboardData.stats, pagination: { total: mockEmpDashboardData.myLeaves.length } };
     }
 
-    if (endpoint.startsWith('/leaves')) {
-      return { leaves: mockHRDashboardData.recentLeaves, stats: mockEmpDashboardData.stats, pagination: { total: mockHRDashboardData.recentLeaves.length } };
+    if (endpoint.startsWith('/leaves/all') || endpoint.startsWith('/leaves')) {
+      // Check for status query parameter
+      const url = new URL(`http://localhost${endpoint}`);
+      const statusParam = url.searchParams.get('status');
+      
+      let filtered = mockHRLeavesList;
+      if (statusParam) {
+        filtered = mockHRLeavesList.filter(l => l.status.toLowerCase() === statusParam.toLowerCase());
+      }
+      
+      return { leaves: filtered, stats: mockEmpDashboardData.stats, pagination: { total: filtered.length } };
+    }
+
+    if (endpoint.includes('/review')) {
+      // Mock review update
+      let body = {};
+      try { body = JSON.parse(options.body || '{}'); } catch (e) {}
+      return { success: true, message: `Leave request status updated to ${body.status}` };
     }
 
     return { success: true, message: 'Action processed (Live Vercel Mode)' };

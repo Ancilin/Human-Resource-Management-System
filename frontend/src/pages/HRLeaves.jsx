@@ -23,7 +23,7 @@ export default function HRLeaves() {
       const leaveList = Array.isArray(res) ? res : (res?.leaves || []);
       setLeaves(leaveList);
     } catch (err) {
-      showToast('Failed to fetch leave requests', 'danger');
+      if (showToast) showToast('Failed to fetch leave requests', 'danger');
     } finally {
       setLoading(false);
     }
@@ -49,18 +49,32 @@ export default function HRLeaves() {
         status: reviewAction,
         review_notes: reviewNotes
       });
-      showToast(`Leave request ${reviewAction.toLowerCase()} successfully!`, 'success');
+
+      // Instantly update client-side leave status badge & notes
+      setLeaves(prev => prev.map(item => {
+        if (item.id === selectedLeave.id) {
+          return { ...item, status: reviewAction, review_notes: reviewNotes || (reviewAction === 'Approved' ? 'Approved by HR' : 'Rejected by HR') };
+        }
+        return item;
+      }));
+
+      if (showToast) showToast(`Leave request ${reviewAction.toLowerCase()} successfully!`, 'success');
       setIsModalOpen(false);
-      fetchLeaves();
     } catch (err) {
-      showToast(err.message || 'Failed to update leave status', 'danger');
+      if (showToast) showToast(err.message || 'Failed to update leave status', 'danger');
     }
   };
+
+  // Safe client-side tab filter fallback
+  const displayedLeaves = leaves.filter(l => {
+    if (!statusTab) return true;
+    return (l.status || '').toLowerCase() === statusTab.toLowerCase();
+  });
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
       {/* Status Tabs Bar */}
-      <div className="glass-card" style={{ display: 'flex', gap: '0.75rem', padding: '0.75rem 1rem' }}>
+      <div className="glass-card" style={{ display: 'flex', gap: '0.75rem', padding: '0.75rem 1rem', flexWrap: 'wrap' }}>
         {[
           { id: '', label: 'All Applications' },
           { id: 'Pending', label: 'Pending Review' },
@@ -71,12 +85,15 @@ export default function HRLeaves() {
             key={tab.id}
             onClick={() => setStatusTab(tab.id)}
             style={{
-              padding: '0.5rem 1rem',
+              padding: '0.55rem 1.15rem',
               borderRadius: 'var(--radius-md)',
               fontSize: '0.875rem',
               fontWeight: 600,
+              cursor: 'pointer',
+              border: statusTab === tab.id ? '1px solid transparent' : '1px solid var(--border-color)',
               color: statusTab === tab.id ? '#ffffff' : 'var(--text-secondary)',
-              background: statusTab === tab.id ? 'var(--accent-gradient)' : 'transparent',
+              background: statusTab === tab.id ? 'var(--accent-gradient)' : 'var(--bg-input)',
+              boxShadow: statusTab === tab.id ? '0 4px 12px rgba(99, 102, 241, 0.3)' : 'none',
               transition: 'all var(--transition-fast)'
             }}
           >
@@ -106,10 +123,10 @@ export default function HRLeaves() {
                 <tr>
                   <td colSpan="8" style={{ textAlign: 'center', padding: '2rem' }}>Loading leave queue...</td>
                 </tr>
-              ) : leaves.length > 0 ? (
-                leaves.map((l) => (
+              ) : displayedLeaves.length > 0 ? (
+                displayedLeaves.map((l) => (
                   <tr key={l.id}>
-                    <td>{new Date(l.applied_at).toLocaleDateString()}</td>
+                    <td>{l.applied_at ? new Date(l.applied_at).toLocaleDateString() : 'Recent'}</td>
                     <td>
                       <div style={{ display: 'flex', flexDirection: 'column' }}>
                         <span style={{ fontWeight: 600 }}>{l.employee_name}</span>
@@ -165,7 +182,7 @@ export default function HRLeaves() {
               ) : (
                 <tr>
                   <td colSpan="8" style={{ textAlign: 'center', padding: '2.5rem', color: 'var(--text-muted)' }}>
-                    No leave requests found in this category.
+                    No leave requests found for status tab: <strong>{statusTab || 'All'}</strong>.
                   </td>
                 </tr>
               )}
