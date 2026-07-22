@@ -5,17 +5,41 @@ const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
-    const saved = localStorage.getItem('hrms_user');
-    return saved ? JSON.parse(saved) : null;
+    try {
+      const saved = localStorage.getItem('hrms_user');
+      return saved ? JSON.parse(saved) : null;
+    } catch (e) {
+      console.warn('Failed to parse saved user from localStorage:', e);
+      return null;
+    }
   });
-  const [token, setToken] = useState(() => localStorage.getItem('hrms_token'));
+
+  const [token, setToken] = useState(() => {
+    try {
+      return localStorage.getItem('hrms_token') || null;
+    } catch (e) {
+      return null;
+    }
+  });
+
   const [loading, setLoading] = useState(true);
-  const [theme, setTheme] = useState(() => localStorage.getItem('hrms_theme') || 'dark');
+  const [theme, setTheme] = useState(() => {
+    try {
+      return localStorage.getItem('hrms_theme') || 'dark';
+    } catch (e) {
+      return 'dark';
+    }
+  });
+
   const [toast, setToast] = useState(null);
 
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('hrms_theme', theme);
+    try {
+      document.documentElement.setAttribute('data-theme', theme);
+      localStorage.setItem('hrms_theme', theme);
+    } catch (e) {
+      console.warn('LocalStorage error setting theme:', e);
+    }
   }, [theme]);
 
   const toggleTheme = () => {
@@ -28,44 +52,72 @@ export function AuthProvider({ children }) {
   };
 
   useEffect(() => {
+    let isMounted = true;
     async function initAuth() {
       if (token) {
         try {
           const res = await api.getMe();
-          setUser(res.user);
-          localStorage.setItem('hrms_user', JSON.stringify(res.user));
+          if (isMounted && res && res.user) {
+            setUser(res.user);
+            localStorage.setItem('hrms_user', JSON.stringify(res.user));
+          }
         } catch (err) {
-          logout();
+          console.warn('initAuth error, performing fallback logout:', err);
+          if (isMounted) {
+            logout();
+          }
         }
       }
-      setLoading(false);
+      if (isMounted) {
+        setLoading(false);
+      }
     }
     initAuth();
+    return () => { isMounted = false; };
   }, [token]);
 
   const login = async (email, password) => {
-    const res = await api.login({ email, password });
-    setToken(res.token);
-    setUser(res.user);
-    localStorage.setItem('hrms_token', res.token);
-    localStorage.setItem('hrms_user', JSON.stringify(res.user));
-    showToast(`Welcome back, ${res.user.employee ? res.user.employee.name : res.user.email}!`, 'success');
-    return res;
+    try {
+      const res = await api.login({ email, password });
+      if (res && res.token && res.user) {
+        setToken(res.token);
+        setUser(res.user);
+        localStorage.setItem('hrms_token', res.token);
+        localStorage.setItem('hrms_user', JSON.stringify(res.user));
+
+        const displayName = res.user.name || (res.user.employee && res.user.employee.name) || res.user.email || 'User';
+        showToast(`Welcome back, ${displayName}!`, 'success');
+        return res;
+      } else {
+        throw new Error('Invalid authentication response');
+      }
+    } catch (err) {
+      showToast(err.message || 'Login failed', 'danger');
+      throw err;
+    }
   };
 
   const logout = () => {
     setToken(null);
     setUser(null);
-    localStorage.removeItem('hrms_token');
-    localStorage.removeItem('hrms_user');
+    try {
+      localStorage.removeItem('hrms_token');
+      localStorage.removeItem('hrms_user');
+    } catch (e) {
+      console.warn('LocalStorage clear error:', e);
+    }
     showToast('Logged out successfully.', 'info');
   };
 
   const updateUserProfile = (employeeData) => {
     if (user) {
-      const updatedUser = { ...user, employee: employeeData };
+      const updatedUser = { ...user, name: employeeData.name || user.name, employee: employeeData };
       setUser(updatedUser);
-      localStorage.setItem('hrms_user', JSON.stringify(updatedUser));
+      try {
+        localStorage.setItem('hrms_user', JSON.stringify(updatedUser));
+      } catch (e) {
+        console.warn('Failed to save updated profile:', e);
+      }
     }
   };
 
@@ -83,7 +135,7 @@ export function AuthProvider({ children }) {
         logout,
         updateUserProfile,
         isHR: user?.role === 'HR',
-        isEmployee: user?.role === 'EMPLOYEE'
+        isEmployee: user?.role === 'EMPLOYEE' || user?.role === 'Employee'
       }}
     >
       {children}
@@ -92,5 +144,5 @@ export function AuthProvider({ children }) {
 }
 
 export function useAuth() {
-  return useContext(AuthContext);
+  return useContext(AuthContext) || {};
 }

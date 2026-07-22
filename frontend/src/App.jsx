@@ -20,6 +20,66 @@ import Profile from './pages/Profile';
 import './styles/global.css';
 import './styles/components.css';
 
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error('Workforce HRMS ErrorBoundary caught an error:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{
+          minHeight: '100vh',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: '#0b1320',
+          color: '#ffffff',
+          padding: '2rem',
+          textAlign: 'center'
+        }}>
+          <div style={{ background: '#1e293b', border: '1px solid rgba(255,255,255,0.1)', padding: '2.5rem', borderRadius: '16px', maxWidth: '500px' }}>
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#ef4444', marginBottom: '1rem' }}>
+              System Recovery Mode
+            </h2>
+            <p style={{ color: '#94a3b8', fontSize: '0.9rem', marginBottom: '1.5rem' }}>
+              An unexpected render error occurred. Click below to clear cache and reload the application portal.
+            </p>
+            <button
+              onClick={() => {
+                localStorage.clear();
+                window.location.reload();
+              }}
+              style={{
+                background: '#10b981',
+                color: '#fff',
+                fontWeight: 700,
+                border: 'none',
+                padding: '0.75rem 1.5rem',
+                borderRadius: '8px',
+                cursor: 'pointer'
+              }}
+            >
+              Reset & Reload HRMS Portal
+            </button>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 function MainApp() {
   const { user, token, loading, isHR } = useAuth();
   const [currentTab, setCurrentTab] = useState('dashboard');
@@ -29,14 +89,25 @@ function MainApp() {
       <div style={{
         minHeight: '100vh',
         display: 'flex',
+        flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        background: 'var(--bg-primary)',
-        color: 'var(--text-primary)',
-        fontSize: '1.1rem',
-        fontWeight: 600
+        background: '#0b1320',
+        color: '#ffffff',
+        gap: '1rem'
       }}>
-        Initializing Workforce HRMS...
+        <div style={{
+          width: '40px',
+          height: '40px',
+          border: '4px solid rgba(16, 185, 129, 0.2)',
+          borderTopColor: '#10b981',
+          borderRadius: '50%',
+          animation: 'spin 1s linear infinite'
+        }}></div>
+        <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#10b981' }}>
+          Initializing Workforce HRMS...
+        </div>
+        <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
       </div>
     );
   }
@@ -106,8 +177,10 @@ function MainApp() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <MainApp />
-    </AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <MainApp />
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }
