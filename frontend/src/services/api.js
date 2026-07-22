@@ -175,12 +175,37 @@ async function request(endpoint, options = {}) {
       return { attendance: mockHRDashboardData.recentActivity, history: mockEmpDashboardData.myRecentAttendance, pagination: { total: mockHRDashboardData.recentActivity.length } };
     }
     
+    if (endpoint === '/leaves/apply') {
+      let body = {};
+      try { body = JSON.parse(options.body || '{}'); } catch (e) {}
+      
+      const newLeave = {
+        id: Date.now(),
+        employee_name: mockEmpUser.name,
+        employee_code: mockEmpUser.employee_code,
+        department: mockEmpUser.department,
+        leave_type: body.leave_type || 'Paid Leave',
+        start_date: body.start_date || new Date().toISOString().split('T')[0],
+        end_date: body.end_date || new Date().toISOString().split('T')[0],
+        days_count: 1,
+        reason: body.reason || 'Personal leave request',
+        status: 'Pending',
+        applied_at: new Date().toISOString().split('T')[0],
+        review_notes: ''
+      };
+
+      mockHRLeavesList.unshift(newLeave);
+      mockEmpDashboardData.myLeaves.unshift(newLeave);
+      mockHRDashboardData.metrics.pendingLeaves += 1;
+
+      return { success: true, message: 'Leave application submitted successfully!', leave: newLeave };
+    }
+
     if (endpoint === '/leaves/my-leaves') {
       return { leaves: mockEmpDashboardData.myLeaves, stats: mockEmpDashboardData.stats, pagination: { total: mockEmpDashboardData.myLeaves.length } };
     }
 
     if (endpoint.startsWith('/leaves/all') || endpoint.startsWith('/leaves')) {
-      // Check for status query parameter
       const url = new URL(`http://localhost${endpoint}`);
       const statusParam = url.searchParams.get('status');
       
@@ -193,9 +218,15 @@ async function request(endpoint, options = {}) {
     }
 
     if (endpoint.includes('/review')) {
-      // Mock review update
       let body = {};
       try { body = JSON.parse(options.body || '{}'); } catch (e) {}
+      const parts = endpoint.split('/');
+      const leaveId = parseInt(parts[2]);
+      const leaveItem = mockHRLeavesList.find(l => l.id === leaveId);
+      if (leaveItem) {
+        leaveItem.status = body.status;
+        leaveItem.review_notes = body.review_notes || `Marked ${body.status} by HR`;
+      }
       return { success: true, message: `Leave request status updated to ${body.status}` };
     }
 
