@@ -57,8 +57,9 @@ export default function EmployeeManagement() {
     setLoading(true);
     try {
       const res = await api.getEmployees({ search, department, page });
-      setEmployees(res.employees);
-      setPagination(res.pagination);
+      const list = Array.isArray(res) ? res : (res?.employees || []);
+      setEmployees(list);
+      setPagination(res?.pagination || {});
     } catch (err) {
       showToast('Failed to load employees', 'danger');
     } finally {

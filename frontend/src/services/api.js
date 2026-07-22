@@ -45,14 +45,14 @@ const mockHRDashboardData = {
     pendingLeaves: 2
   },
   recentActivity: [
-    { id: 101, employee_name: 'Priya Sharma', department: 'Engineering', check_in: '09:02 AM', check_out: null, status: 'Present' },
-    { id: 102, employee_name: 'Rahul Verma', department: 'Product Design', check_in: '08:55 AM', check_out: null, status: 'Present' },
-    { id: 103, employee_name: 'Ananya Patel', department: 'Marketing', check_in: '09:15 AM', check_out: null, status: 'Present' },
-    { id: 104, employee_name: 'Vikram Singh', department: 'Sales', check_in: '--:--', check_out: '--:--', status: 'On Leave' }
+    { id: 101, employee_name: 'Priya Sharma', department: 'Engineering', check_in: '09:02 AM', check_out: null, status: 'Present', date: '2026-07-22', employee_code: 'EMP-ENG-042', total_hours: 8 },
+    { id: 102, employee_name: 'Rahul Verma', department: 'Product Design', check_in: '08:55 AM', check_out: null, status: 'Present', date: '2026-07-22', employee_code: 'EMP-DES-012', total_hours: 8 },
+    { id: 103, employee_name: 'Ananya Patel', department: 'Marketing', check_in: '09:15 AM', check_out: null, status: 'Present', date: '2026-07-22', employee_code: 'EMP-MKT-009', total_hours: 7.5 },
+    { id: 104, employee_name: 'Vikram Singh', department: 'Sales', check_in: '--:--', check_out: '--:--', status: 'On Leave', date: '2026-07-22', employee_code: 'EMP-SLS-055', total_hours: 0 }
   ],
   recentLeaves: [
-    { id: 201, employee_name: 'Vikram Singh', leave_type: 'Sick Leave', start_date: '2026-07-22', end_date: '2026-07-23', days_count: 2, reason: 'High fever and doctor consultation' },
-    { id: 202, employee_name: 'Neha Kapoor', leave_type: 'Casual Leave', start_date: '2026-07-25', end_date: '2026-07-26', days_count: 2, reason: 'Family function trip' }
+    { id: 201, employee_name: 'Vikram Singh', employee_code: 'EMP-SLS-055', department: 'Sales', leave_type: 'Sick Leave', start_date: '2026-07-22', end_date: '2026-07-23', days_count: 2, reason: 'High fever and doctor consultation', status: 'Pending', applied_at: '2026-07-21' },
+    { id: 202, employee_name: 'Neha Kapoor', employee_code: 'EMP-MKT-011', department: 'Marketing', leave_type: 'Casual Leave', start_date: '2026-07-25', end_date: '2026-07-26', days_count: 2, reason: 'Family function trip', status: 'Approved', applied_at: '2026-07-20' }
   ]
 };
 
@@ -76,20 +76,18 @@ const mockEmpDashboardData = {
 };
 
 const mockEmployeesList = [
-  { id: 1, name: 'HR Admin Manager', email: 'hr@company.com', role: 'HR', department: 'Human Resources', employee_code: 'EMP-HR-001', phone: '+1 555-0199', status: 'Active' },
-  { id: 2, name: 'Priya Sharma', email: 'priya96@gmail.com', role: 'Employee', department: 'Engineering', employee_code: 'EMP-ENG-042', phone: '+1 555-0142', status: 'Active' },
-  { id: 3, name: 'Rahul Verma', email: 'rahul.verma@company.com', role: 'Employee', department: 'Product Design', employee_code: 'EMP-DES-012', phone: '+1 555-0188', status: 'Active' },
-  { id: 4, name: 'Ananya Patel', email: 'ananya.p@company.com', role: 'Employee', department: 'Marketing', employee_code: 'EMP-MKT-009', phone: '+1 555-0133', status: 'Active' },
-  { id: 5, name: 'Vikram Singh', email: 'vikram.s@company.com', role: 'Employee', department: 'Sales', employee_code: 'EMP-SLS-055', phone: '+1 555-0177', status: 'Active' }
+  { id: 1, name: 'HR Admin Manager', email: 'hr@company.com', role: 'HR', department: 'Human Resources', designation: 'HR Director', employee_code: 'EMP-HR-001', phone: '+1 555-0199', date_of_joining: '2022-01-10', status: 'Active' },
+  { id: 2, name: 'Priya Sharma', email: 'priya96@gmail.com', role: 'Employee', department: 'Engineering', designation: 'Senior Software Engineer', employee_code: 'EMP-ENG-042', phone: '+1 555-0142', date_of_joining: '2023-03-15', status: 'Active' },
+  { id: 3, name: 'Rahul Verma', email: 'rahul.verma@company.com', role: 'Employee', department: 'Product & Design', designation: 'UI/UX Designer', employee_code: 'EMP-DES-012', phone: '+1 555-0188', date_of_joining: '2023-05-20', status: 'Active' },
+  { id: 4, name: 'Ananya Patel', email: 'ananya.p@company.com', role: 'Employee', department: 'Marketing', designation: 'Marketing Lead', employee_code: 'EMP-MKT-009', phone: '+1 555-0133', date_of_joining: '2023-08-01', status: 'Active' },
+  { id: 5, name: 'Vikram Singh', email: 'vikram.s@company.com', role: 'Employee', department: 'Sales', designation: 'Sales Manager', employee_code: 'EMP-SLS-055', phone: '+1 555-0177', date_of_joining: '2023-09-12', status: 'Active' }
 ];
 
 async function request(endpoint, options = {}) {
   let token = null;
   try {
     token = localStorage.getItem('hrms_token');
-  } catch (e) {
-    console.warn('LocalStorage token read error:', e);
-  }
+  } catch (e) {}
 
   const headers = {
     'Content-Type': 'application/json',
@@ -104,7 +102,7 @@ async function request(endpoint, options = {}) {
 
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 3500); // 3.5s timeout for fast fallback
+    const timeoutId = setTimeout(() => controller.abort(), 2500); // 2.5s fast timeout
     
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
       ...config,
@@ -132,15 +130,12 @@ async function request(endpoint, options = {}) {
 
     return data;
   } catch (error) {
-    console.warn(`API call to ${endpoint} unhandled by backend. Using live Vercel fallback mode.`, error.message);
+    console.warn(`API endpoint ${endpoint} live fallback mode activated:`, error.message);
 
-    // MOCK FALLBACK HANDLERS FOR LIVE VERCEL DEMO
+    // MOCK FALLBACK HANDLERS FOR LIVE VERCEL DEMO (FORMATTED EXACTLY LIKE EXPRESS API)
     if (endpoint === '/auth/login') {
       let body = {};
-      try {
-        body = JSON.parse(options.body || '{}');
-      } catch (e) {}
-
+      try { body = JSON.parse(options.body || '{}'); } catch (e) {}
       const email = (body.email || '').toLowerCase().trim();
       
       if (email.includes('hr') || email === 'hr@company.com') {
@@ -161,12 +156,20 @@ async function request(endpoint, options = {}) {
 
     if (endpoint === '/dashboard/hr') return mockHRDashboardData;
     if (endpoint === '/dashboard/employee') return mockEmpDashboardData;
-    if (endpoint.startsWith('/employees')) return mockEmployeesList;
-    if (endpoint.startsWith('/attendance')) return mockHRDashboardData.recentActivity;
-    if (endpoint.startsWith('/leaves')) return mockHRDashboardData.recentLeaves;
+    
+    if (endpoint.startsWith('/employees')) {
+      return { employees: mockEmployeesList, pagination: { total: mockEmployeesList.length, page: 1, totalPages: 1 } };
+    }
+    
+    if (endpoint.startsWith('/attendance')) {
+      return { attendance: mockHRDashboardData.recentActivity, pagination: { total: mockHRDashboardData.recentActivity.length } };
+    }
+    
+    if (endpoint.startsWith('/leaves')) {
+      return { leaves: mockHRDashboardData.recentLeaves, pagination: { total: mockHRDashboardData.recentLeaves.length } };
+    }
 
-    // Default fallback
-    return { success: true, message: 'Action processed (Vercel Live Mode)' };
+    return { success: true, message: 'Action processed (Live Vercel Mode)' };
   }
 }
 

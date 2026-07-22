@@ -17,7 +17,8 @@ export default function HRAttendance() {
     async function loadFilterOptions() {
       try {
         const empRes = await api.getEmployees({ limit: 100 });
-        setEmployees(empRes.employees);
+        const empList = Array.isArray(empRes) ? empRes : (empRes?.employees || []);
+        setEmployees(empList);
       } catch (err) {
         console.error('Failed to load employee list for filter');
       }
@@ -32,7 +33,8 @@ export default function HRAttendance() {
         employee_id: selectedEmployee,
         date: selectedDate
       });
-      setAttendance(res.attendance);
+      const attList = Array.isArray(res) ? res : (res?.attendance || []);
+      setAttendance(attList);
     } catch (err) {
       showToast('Failed to fetch attendance logs', 'danger');
     } finally {

@@ -20,7 +20,8 @@ export default function HRLeaves() {
     setLoading(true);
     try {
       const res = await api.getAllLeaves({ status: statusTab });
-      setLeaves(res.leaves);
+      const leaveList = Array.isArray(res) ? res : (res?.leaves || []);
+      setLeaves(leaveList);
     } catch (err) {
       showToast('Failed to fetch leave requests', 'danger');
     } finally {
