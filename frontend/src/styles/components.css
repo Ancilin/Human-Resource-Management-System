@@ -285,6 +285,12 @@
   to { transform: translateY(0); opacity: 1; }
 }
 
+.text-gradient {
+  background: var(--accent-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
 /* ==========================================================================
    3D Visual & Motion Animation Utilities
    ========================================================================== */

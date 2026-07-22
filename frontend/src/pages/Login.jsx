@@ -3,7 +3,10 @@ import { useAuth } from '../context/AuthContext';
 import { Building2, Lock, Mail, UserCheck, ShieldCheck, Eye, EyeOff, Zap, Users, CalendarDays, CheckCircle2 } from 'lucide-react';
 
 export default function Login() {
-  const { login, showToast } = useAuth();
+  const auth = useAuth() || {};
+  const login = auth.login;
+  const showToast = auth.showToast;
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -20,7 +23,9 @@ export default function Login() {
     setLoading(true);
 
     try {
-      await login(email, password);
+      if (login) {
+        await login(email, password);
+      }
     } catch (err) {
       setError(err.message || 'Invalid credentials. Please verify your email and password.');
       if (showToast) showToast(err.message || 'Login failed', 'danger');
@@ -63,7 +68,7 @@ export default function Login() {
         {/* Headline & 3D Artwork */}
         <div>
           <h2 style={{ fontSize: '2.2rem', fontWeight: 800, color: '#fff', lineHeight: 1.25, letterSpacing: '-0.02em', marginBottom: '1rem' }}>
-            Empowering Modern <span style={{ background: 'var(--accent-gradient)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Workforce & HR</span> Excellence
+            Empowering Modern <span className="text-gradient">Workforce & HR</span> Excellence
           </h2>
           <p style={{ color: '#9ca3af', fontSize: '0.95rem', lineHeight: 1.6, maxWidth: '520px' }}>
             Streamline employee directory management, automated attendance logs, instant leave approvals, and executive payroll analytics in one high-performance platform.

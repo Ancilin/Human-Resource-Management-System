@@ -31,11 +31,12 @@ class ErrorBoundary extends React.Component {
   }
 
   componentDidCatch(error, errorInfo) {
-    console.error('Workforce HRMS ErrorBoundary caught an error:', error, errorInfo);
+    console.error('Workforce HRMS ErrorBoundary caught error:', error, errorInfo);
   }
 
   render() {
     if (this.state.hasError) {
+      const errorMsg = this.state.error ? (this.state.error.stack || this.state.error.message || String(this.state.error)) : 'Unknown Error';
       return (
         <div style={{
           minHeight: '100vh',
@@ -48,16 +49,16 @@ class ErrorBoundary extends React.Component {
           padding: '2rem',
           textAlign: 'center'
         }}>
-          <div style={{ background: '#1e293b', border: '1px solid rgba(255,255,255,0.1)', padding: '2.5rem', borderRadius: '16px', maxWidth: '500px' }}>
-            <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#ef4444', marginBottom: '1rem' }}>
-              System Recovery Mode
+          <div style={{ background: '#1e293b', border: '1px solid rgba(255,255,255,0.1)', padding: '2.5rem', borderRadius: '16px', maxWidth: '600px', width: '100%' }}>
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#ef4444', marginBottom: '0.75rem' }}>
+              System Error Diagnostic
             </h2>
-            <p style={{ color: '#94a3b8', fontSize: '0.9rem', marginBottom: '1.5rem' }}>
-              An unexpected render error occurred. Click below to clear cache and reload the application portal.
-            </p>
+            <div style={{ background: '#0f172a', padding: '1rem', borderRadius: '8px', color: '#f87171', fontSize: '0.8rem', textAlign: 'left', fontFamily: 'monospace', overflowX: 'auto', marginBottom: '1.5rem', whiteSpace: 'pre-wrap', maxHeight: '200px' }}>
+              {errorMsg}
+            </div>
             <button
               onClick={() => {
-                localStorage.clear();
+                try { localStorage.clear(); } catch (e) {}
                 window.location.reload();
               }}
               style={{
@@ -81,7 +82,8 @@ class ErrorBoundary extends React.Component {
 }
 
 function MainApp() {
-  const { user, token, loading, isHR } = useAuth();
+  const auth = useAuth() || {};
+  const { user, token, loading, isHR } = auth;
   const [currentTab, setCurrentTab] = useState('dashboard');
 
   if (loading) {
