@@ -7,7 +7,7 @@ import { CalendarPlus, CalendarDays, Clock, CheckCircle2 } from 'lucide-react';
 export default function EmployeeLeaves() {
   const { showToast } = useAuth();
   const [leaves, setLeaves] = useState([]);
-  const [stats, setStats] = useState({});
+  const [stats, setStats] = useState({ annualQuota: 24, usedDays: 0, remainingBalance: 24 });
   const [loading, setLoading] = useState(true);
   const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
 
@@ -22,10 +22,13 @@ export default function EmployeeLeaves() {
     setLoading(true);
     try {
       const res = await api.getMyLeaves();
-      setLeaves(res.leaves);
-      setStats(res.stats);
+      const list = Array.isArray(res) ? res : (res?.leaves || []);
+      setLeaves(list);
+      if (res?.stats) {
+        setStats(res.stats);
+      }
     } catch (err) {
-      showToast('Failed to load leave history', 'danger');
+      if (showToast) showToast('Failed to load leave history', 'danger');
     } finally {
       setLoading(false);
     }
@@ -38,13 +41,13 @@ export default function EmployeeLeaves() {
   const handleApplySubmit = async (e) => {
     e.preventDefault();
     if (!formData.reason) {
-      showToast('Please provide a reason for your leave request', 'danger');
+      if (showToast) showToast('Please provide a reason for your leave request', 'danger');
       return;
     }
 
     try {
       await api.applyLeave(formData);
-      showToast('Leave request submitted successfully!', 'success');
+      if (showToast) showToast('Leave request submitted successfully!', 'success');
       setIsApplyModalOpen(false);
       setFormData({
         leave_type: 'Paid Leave',
@@ -54,7 +57,7 @@ export default function EmployeeLeaves() {
       });
       fetchMyLeaves();
     } catch (err) {
-      showToast(err.message || 'Failed to submit leave request', 'danger');
+      if (showToast) showToast(err.message || 'Failed to submit leave request', 'danger');
     }
   };
 
@@ -65,15 +68,15 @@ export default function EmployeeLeaves() {
         <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
           <div>
             <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Annual Allocation</span>
-            <h3 style={{ fontSize: '1.4rem', fontWeight: 800 }}>{stats.annualQuota || 24} Days</h3>
+            <h3 style={{ fontSize: '1.4rem', fontWeight: 800 }}>{(stats && stats.annualQuota) || 24} Days</h3>
           </div>
           <div>
             <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Approved Used</span>
-            <h3 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--color-warning)' }}>{stats.usedDays || 0} Days</h3>
+            <h3 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--color-warning)' }}>{(stats && stats.usedDays) || 0} Days</h3>
           </div>
           <div>
             <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Available Balance</span>
-            <h3 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--color-success)' }}>{stats.remainingBalance || 24} Days</h3>
+            <h3 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--color-success)' }}>{(stats && stats.remainingBalance) || 24} Days</h3>
           </div>
         </div>
 
@@ -104,10 +107,10 @@ export default function EmployeeLeaves() {
                 <tr>
                   <td colSpan="7" style={{ textAlign: 'center', padding: '2rem' }}>Loading leave history...</td>
                 </tr>
-              ) : leaves.length > 0 ? (
+              ) : leaves && leaves.length > 0 ? (
                 leaves.map((l) => (
                   <tr key={l.id}>
-                    <td>{new Date(l.applied_at).toLocaleDateString()}</td>
+                    <td>{l.applied_at ? new Date(l.applied_at).toLocaleDateString() : 'Recent'}</td>
                     <td>
                       <span className="badge badge-info">{l.leave_type}</span>
                     </td>

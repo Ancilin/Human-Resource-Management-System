@@ -71,8 +71,13 @@ const mockEmpDashboardData = {
     { id: 303, date: '2026-07-20', check_in: '09:05 AM', check_out: '06:10 PM', hours: '9.0 hrs', status: 'Present' }
   ],
   myLeaves: [
-    { id: 401, leave_type: 'Casual Leave', start_date: '2026-06-10', end_date: '2026-06-11', days_count: 2, status: 'Approved', reason: 'Personal work' }
-  ]
+    { id: 401, leave_type: 'Casual Leave', start_date: '2026-06-10', end_date: '2026-06-11', days_count: 2, status: 'Approved', reason: 'Personal work', applied_at: '2026-06-08' }
+  ],
+  stats: {
+    annualQuota: 24,
+    usedDays: 2,
+    remainingBalance: 22
+  }
 };
 
 const mockEmployeesList = [
@@ -162,11 +167,15 @@ async function request(endpoint, options = {}) {
     }
     
     if (endpoint.startsWith('/attendance')) {
-      return { attendance: mockHRDashboardData.recentActivity, pagination: { total: mockHRDashboardData.recentActivity.length } };
+      return { attendance: mockHRDashboardData.recentActivity, history: mockEmpDashboardData.myRecentAttendance, pagination: { total: mockHRDashboardData.recentActivity.length } };
     }
     
+    if (endpoint === '/leaves/my-leaves') {
+      return { leaves: mockEmpDashboardData.myLeaves, stats: mockEmpDashboardData.stats, pagination: { total: mockEmpDashboardData.myLeaves.length } };
+    }
+
     if (endpoint.startsWith('/leaves')) {
-      return { leaves: mockHRDashboardData.recentLeaves, pagination: { total: mockHRDashboardData.recentLeaves.length } };
+      return { leaves: mockHRDashboardData.recentLeaves, stats: mockEmpDashboardData.stats, pagination: { total: mockHRDashboardData.recentLeaves.length } };
     }
 
     return { success: true, message: 'Action processed (Live Vercel Mode)' };
