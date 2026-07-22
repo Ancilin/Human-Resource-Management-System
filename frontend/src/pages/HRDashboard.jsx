@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import StatCard from '../components/StatCard';
-import { Users, UserCheck, CalendarX, Clock, ArrowRight, UserPlus, CheckCircle, FileText, Zap, ShieldCheck } from 'lucide-react';
+import { Users, UserCheck, CalendarX, Clock, ArrowRight, UserPlus, CheckCircle2, FileText, Zap } from 'lucide-react';
 
 export default function HRDashboard({ setCurrentTab }) {
   const [data, setData] = useState(null);
@@ -52,7 +52,7 @@ export default function HRDashboard({ setCurrentTab }) {
               <UserPlus size={15} /> + Add Employee
             </button>
             <button className="action-pill-btn" onClick={() => setCurrentTab('leaves')}>
-              <CheckCircle size={15} /> Approve Leaves
+              <CheckCircle2 size={15} /> Approve Leaves
             </button>
             <button className="action-pill-btn" onClick={() => setCurrentTab('attendance')}>
               <Clock size={15} /> Attendance Logs

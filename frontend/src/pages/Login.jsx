@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Building2, Lock, Mail, UserCheck, ShieldCheck, Eye, EyeOff, Zap, Users, Calendar, Award, CheckCircle2 } from 'lucide-react';
+import { Building2, Lock, Mail, UserCheck, ShieldCheck, Eye, EyeOff, Zap, Users, CalendarDays, CheckCircle2 } from 'lucide-react';
 
 export default function Login() {
   const { login, showToast } = useAuth();
@@ -23,7 +23,7 @@ export default function Login() {
       await login(email, password);
     } catch (err) {
       setError(err.message || 'Invalid credentials. Please verify your email and password.');
-      showToast(err.message || 'Login failed', 'danger');
+      if (showToast) showToast(err.message || 'Login failed', 'danger');
     } finally {
       setLoading(false);
     }
@@ -96,10 +96,10 @@ export default function Login() {
               <Users size={16} color="#6366f1" /> 100% Digital Employee Files
             </div>
             <div className="feature-chip">
-              <Calendar size={16} color="#10b981" /> Instant Leave Approvals
+              <CalendarDays size={16} color="#10b981" /> Instant Leave Approvals
             </div>
             <div className="feature-chip">
-              <Award size={16} color="#f59e0b" /> Payroll & Salary Reports
+              <ShieldCheck size={16} color="#f59e0b" /> Payroll & Salary Reports
             </div>
             <div className="feature-chip">
               <CheckCircle2 size={16} color="#3b82f6" /> 256-Bit SSL Enterprise Security
