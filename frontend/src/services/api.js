@@ -62,18 +62,26 @@ const mockHRDashboardData = {
 };
 
 const mockEmpDashboardData = {
-  summary: {
+  profile: {
     name: 'Priya Sharma',
-    role: 'Senior Software Engineer',
+    email: 'priya96@gmail.com',
+    employee_code: 'EMP-ENG-042',
     department: 'Engineering',
-    joinedDate: '2023-03-15',
-    attendanceToday: 'Present (Checked in at 09:02 AM)',
-    leaveBalance: { paid: 12, sick: 7, casual: 5 }
+    designation: 'Senior Software Engineer',
+    avatar: ''
   },
+  todayAttendance: null, // Starts as not punched in
+  leaveStats: {
+    annualQuota: 24,
+    usedDays: 2,
+    remainingBalance: 22
+  },
+  notifications: [
+    { id: 1, title: 'Welcome to Workforce HRMS', message: 'Your employee portal account is active. Use this portal to check in/out and apply for leaves.' }
+  ],
   myRecentAttendance: [
-    { id: 301, date: '2026-07-22', check_in: '09:02 AM', check_out: 'Active', hours: '7.5 hrs', status: 'Present' },
-    { id: 302, date: '2026-07-21', check_in: '08:58 AM', check_out: '06:05 PM', hours: '9.1 hrs', status: 'Present' },
-    { id: 303, date: '2026-07-20', check_in: '09:05 AM', check_out: '06:10 PM', hours: '9.0 hrs', status: 'Present' }
+    { id: 302, date: '2026-07-22', check_in: '08:58 AM', check_out: '06:05 PM', hours: '9.1 hrs', status: 'Present' },
+    { id: 303, date: '2026-07-21', check_in: '09:05 AM', check_out: '06:10 PM', hours: '9.0 hrs', status: 'Present' }
   ],
   myLeaves: [
     { id: 401, leave_type: 'Casual Leave', start_date: '2026-06-10', end_date: '2026-06-11', days_count: 2, status: 'Approved', reason: 'Personal work', applied_at: '2026-06-08' }
@@ -171,10 +179,90 @@ async function request(endpoint, options = {}) {
       return { employees: mockEmployeesList, pagination: { total: mockEmployeesList.length, page: 1, totalPages: 1 } };
     }
     
+    // Attendance Endpoints
+    if (endpoint === '/attendance/check-in') {
+      const now = new Date();
+      const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const todayDate = now.toISOString().split('T')[0];
+      
+      mockEmpDashboardData.todayAttendance = {
+        id: Date.now(),
+        employee_id: 2,
+        date: todayDate,
+        check_in: timeString,
+        check_out: null,
+        total_hours: null,
+        status: 'Present'
+      };
+
+      // Add to myRecentAttendance logs
+      mockEmpDashboardData.myRecentAttendance.unshift({
+        id: Date.now(),
+        date: todayDate,
+        check_in: timeString,
+        check_out: 'Active',
+        hours: '--',
+        status: 'Present'
+      });
+
+      // Also add to global HR Activity today
+      mockHRDashboardData.recentActivity.unshift({
+        id: Date.now(),
+        employee_name: mockEmpUser.name,
+        employee_code: mockEmpUser.employee_code,
+        department: mockEmpUser.department,
+        check_in: timeString,
+        check_out: null,
+        status: 'Present',
+        date: todayDate,
+        total_hours: null
+      });
+
+      mockHRDashboardData.metrics.presentToday += 1;
+
+      return { success: true, message: 'Clocked in successfully!' };
+    }
+
+    if (endpoint === '/attendance/check-out') {
+      const now = new Date();
+      const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const todayDate = now.toISOString().split('T')[0];
+
+      if (mockEmpDashboardData.todayAttendance) {
+        mockEmpDashboardData.todayAttendance.check_out = timeString;
+        mockEmpDashboardData.todayAttendance.total_hours = 8.5;
+      }
+
+      // Update in myRecentAttendance
+      const log = mockEmpDashboardData.myRecentAttendance.find(l => l.date === todayDate);
+      if (log) {
+        log.check_out = timeString;
+        log.hours = '8.5 hrs';
+      }
+
+      // Update in global HR Activity
+      const hrLog = mockHRDashboardData.recentActivity.find(a => a.employee_code === mockEmpUser.employee_code && a.date === todayDate);
+      if (hrLog) {
+        hrLog.check_out = timeString;
+        hrLog.total_hours = 8.5;
+      }
+
+      return { success: true, message: 'Clocked out successfully!' };
+    }
+
+    if (endpoint === '/attendance/today') {
+      return mockEmpDashboardData.todayAttendance;
+    }
+
+    if (endpoint === '/attendance/my-history') {
+      return { attendance: mockEmpDashboardData.myRecentAttendance };
+    }
+
     if (endpoint.startsWith('/attendance')) {
       return { attendance: mockHRDashboardData.recentActivity, history: mockEmpDashboardData.myRecentAttendance, pagination: { total: mockHRDashboardData.recentActivity.length } };
     }
     
+    // Leave Endpoints
     if (endpoint === '/leaves/apply') {
       let body = {};
       try { body = JSON.parse(options.body || '{}'); } catch (e) {}
