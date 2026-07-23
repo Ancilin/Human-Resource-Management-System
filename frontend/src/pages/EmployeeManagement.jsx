@@ -337,6 +337,33 @@ export default function EmployeeManagement() {
             </tbody>
           </table>
         </div>
+
+        {/* Pagination Controls */}
+        {pagination && pagination.totalPages > 1 && (
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1.25rem', paddingTop: '1.25rem', borderTop: '1px solid var(--border-color)', flexWrap: 'wrap', gap: '0.75rem' }}>
+            <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+              Showing page <strong>{page}</strong> of <strong>{pagination.totalPages}</strong> ({pagination.total} employees)
+            </span>
+            <div style={{ display: 'flex', gap: '0.5rem' }}>
+              <button
+                className="btn btn-secondary btn-sm"
+                disabled={page === 1}
+                onClick={() => setPage(prev => Math.max(1, prev - 1))}
+                style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem' }}
+              >
+                Previous
+              </button>
+              <button
+                className="btn btn-secondary btn-sm"
+                disabled={page === pagination.totalPages}
+                onClick={() => setPage(prev => Math.min(pagination.totalPages, prev + 1))}
+                style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem' }}
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Bulk Import Modal */}
