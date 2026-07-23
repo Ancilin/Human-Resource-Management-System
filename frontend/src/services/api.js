@@ -1,7 +1,7 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
 
-// Fail-safe Mock Database for live Vercel deployment
-const mockHRUser = {
+// Declaring user variables as let for persistence loading
+let mockHRUser = {
   id: 1,
   name: 'HR Admin Manager',
   email: 'hr@company.com',
@@ -19,7 +19,7 @@ const mockHRUser = {
   }
 };
 
-const mockEmpUser = {
+let mockEmpUser = {
   id: 2,
   name: 'Priya Sharma',
   email: 'priya96@gmail.com',
@@ -37,7 +37,7 @@ const mockEmpUser = {
   }
 };
 
-// Declaring variables for local data persistence
+// Declaring dataset variables for local data persistence
 let mockHRLeavesList = [];
 let mockHRDashboardData = {};
 let mockEmpDashboardData = {};
@@ -46,6 +46,8 @@ let mockEmployeesList = [];
 // Persistence helper functions
 function saveMockData() {
   try {
+    localStorage.setItem('mock_hr_user', JSON.stringify(mockHRUser));
+    localStorage.setItem('mock_emp_user', JSON.stringify(mockEmpUser));
     localStorage.setItem('mock_hr_leaves', JSON.stringify(mockHRLeavesList));
     localStorage.setItem('mock_hr_dashboard', JSON.stringify(mockHRDashboardData));
     localStorage.setItem('mock_emp_dashboard', JSON.stringify(mockEmpDashboardData));
@@ -57,10 +59,15 @@ function saveMockData() {
 
 function initMockData() {
   try {
+    const savedHRUser = localStorage.getItem('mock_hr_user');
+    const savedEmpUser = localStorage.getItem('mock_emp_user');
     const leaves = localStorage.getItem('mock_hr_leaves');
     const hrDash = localStorage.getItem('mock_hr_dashboard');
     const empDash = localStorage.getItem('mock_emp_dashboard');
     const emps = localStorage.getItem('mock_employees');
+
+    if (savedHRUser) mockHRUser = JSON.parse(savedHRUser);
+    if (savedEmpUser) mockEmpUser = JSON.parse(savedEmpUser);
 
     mockHRLeavesList = leaves ? JSON.parse(leaves) : [
       { id: 201, employee_name: 'Vikram Singh', employee_code: 'EMP-SLS-055', department: 'Sales', leave_type: 'Sick Leave', start_date: '2026-07-22', end_date: '2026-07-23', days_count: 2, reason: 'High fever and doctor consultation', status: 'Pending', applied_at: '2026-07-21', review_notes: '' },
@@ -93,7 +100,8 @@ function initMockData() {
         employee_code: 'EMP-ENG-042',
         department: 'Engineering',
         designation: 'Senior Software Engineer',
-        avatar: ''
+        avatar: '',
+        phone: '+1 555-0142'
       },
       todayAttendance: null,
       leaveStats: {
@@ -117,6 +125,10 @@ function initMockData() {
         remainingBalance: 22
       }
     };
+
+    // Keep dynamic sync with loaded user state
+    mockEmpDashboardData.profile.name = mockEmpUser.name;
+    mockEmpDashboardData.profile.phone = mockEmpUser.employee.phone;
 
     mockEmployeesList = emps ? JSON.parse(emps) : [
       { id: 1, name: 'HR Admin Manager', email: 'hr@company.com', role: 'HR', department: 'Human Resources', designation: 'HR Director', employee_code: 'EMP-HR-001', phone: '+1 555-0199', date_of_joining: '2022-01-10', status: 'Active' },
