@@ -37,69 +37,101 @@ const mockEmpUser = {
   }
 };
 
-const mockHRLeavesList = [
-  { id: 201, employee_name: 'Vikram Singh', employee_code: 'EMP-SLS-055', department: 'Sales', leave_type: 'Sick Leave', start_date: '2026-07-22', end_date: '2026-07-23', days_count: 2, reason: 'High fever and doctor consultation', status: 'Pending', applied_at: '2026-07-21', review_notes: '' },
-  { id: 202, employee_name: 'Neha Kapoor', employee_code: 'EMP-MKT-011', department: 'Marketing', leave_type: 'Casual Leave', start_date: '2026-07-25', end_date: '2026-07-26', days_count: 2, reason: 'Family function trip', status: 'Approved', applied_at: '2026-07-20', review_notes: 'Approved. Enjoy your time off.' },
-  { id: 203, employee_name: 'Rahul Verma', employee_code: 'EMP-DES-012', department: 'Product & Design', leave_type: 'Paid Leave', start_date: '2026-08-01', end_date: '2026-08-05', days_count: 5, reason: 'Annual vacation trip', status: 'Pending', applied_at: '2026-07-22', review_notes: '' },
-  { id: 204, employee_name: 'Priya Sharma', employee_code: 'EMP-ENG-042', department: 'Engineering', leave_type: 'Casual Leave', start_date: '2026-06-10', end_date: '2026-06-11', days_count: 2, reason: 'Personal work', status: 'Approved', applied_at: '2026-06-08', review_notes: 'Approved by HR.' },
-  { id: 205, employee_name: 'David Miller', employee_code: 'EMP-FIN-033', department: 'Finance', leave_type: 'Unpaid Leave', start_date: '2026-07-15', end_date: '2026-07-16', days_count: 2, reason: 'Shortage of leave quota', status: 'Rejected', applied_at: '2026-07-12', review_notes: 'Rejected due to month-end financial audit deadlines.' }
-];
+// Declaring variables for local data persistence
+let mockHRLeavesList = [];
+let mockHRDashboardData = {};
+let mockEmpDashboardData = {};
+let mockEmployeesList = [];
 
-const mockHRDashboardData = {
-  metrics: {
-    totalEmployees: 42,
-    presentToday: 38,
-    onLeaveToday: 3,
-    pendingLeaves: 2
-  },
-  recentActivity: [
-    { id: 101, employee_name: 'Priya Sharma', department: 'Engineering', check_in: '09:02 AM', check_out: null, status: 'Present', date: '2026-07-22', employee_code: 'EMP-ENG-042', total_hours: 8 },
-    { id: 102, employee_name: 'Rahul Verma', department: 'Product Design', check_in: '08:55 AM', check_out: null, status: 'Present', date: '2026-07-22', employee_code: 'EMP-DES-012', total_hours: 8 },
-    { id: 103, employee_name: 'Ananya Patel', department: 'Marketing', check_in: '09:15 AM', check_out: null, status: 'Present', date: '2026-07-22', employee_code: 'EMP-MKT-009', total_hours: 7.5 },
-    { id: 104, employee_name: 'Vikram Singh', department: 'Sales', check_in: '--:--', check_out: '--:--', status: 'On Leave', date: '2026-07-22', employee_code: 'EMP-SLS-055', total_hours: 0 }
-  ],
-  recentLeaves: mockHRLeavesList
-};
-
-const mockEmpDashboardData = {
-  profile: {
-    name: 'Priya Sharma',
-    email: 'priya96@gmail.com',
-    employee_code: 'EMP-ENG-042',
-    department: 'Engineering',
-    designation: 'Senior Software Engineer',
-    avatar: ''
-  },
-  todayAttendance: null, // Starts as not punched in
-  leaveStats: {
-    annualQuota: 24,
-    usedDays: 2,
-    remainingBalance: 22
-  },
-  notifications: [
-    { id: 1, title: 'Welcome to Workforce HRMS', message: 'Your employee portal account is active. Use this portal to check in/out and apply for leaves.' }
-  ],
-  myRecentAttendance: [
-    { id: 302, date: '2026-07-22', check_in: '08:58 AM', check_out: '06:05 PM', hours: '9.1 hrs', status: 'Present' },
-    { id: 303, date: '2026-07-21', check_in: '09:05 AM', check_out: '06:10 PM', hours: '9.0 hrs', status: 'Present' }
-  ],
-  myLeaves: [
-    { id: 401, leave_type: 'Casual Leave', start_date: '2026-06-10', end_date: '2026-06-11', days_count: 2, status: 'Approved', reason: 'Personal work', applied_at: '2026-06-08' }
-  ],
-  stats: {
-    annualQuota: 24,
-    usedDays: 2,
-    remainingBalance: 22
+// Persistence helper functions
+function saveMockData() {
+  try {
+    localStorage.setItem('mock_hr_leaves', JSON.stringify(mockHRLeavesList));
+    localStorage.setItem('mock_hr_dashboard', JSON.stringify(mockHRDashboardData));
+    localStorage.setItem('mock_emp_dashboard', JSON.stringify(mockEmpDashboardData));
+    localStorage.setItem('mock_employees', JSON.stringify(mockEmployeesList));
+  } catch (e) {
+    console.warn('Failed to save mock database state:', e);
   }
-};
+}
 
-const mockEmployeesList = [
-  { id: 1, name: 'HR Admin Manager', email: 'hr@company.com', role: 'HR', department: 'Human Resources', designation: 'HR Director', employee_code: 'EMP-HR-001', phone: '+1 555-0199', date_of_joining: '2022-01-10', status: 'Active' },
-  { id: 2, name: 'Priya Sharma', email: 'priya96@gmail.com', role: 'Employee', department: 'Engineering', designation: 'Senior Software Engineer', employee_code: 'EMP-ENG-042', phone: '+1 555-0142', date_of_joining: '2023-03-15', status: 'Active' },
-  { id: 3, name: 'Rahul Verma', email: 'rahul.verma@company.com', role: 'Employee', department: 'Product & Design', designation: 'UI/UX Designer', employee_code: 'EMP-DES-012', phone: '+1 555-0188', date_of_joining: '2023-05-20', status: 'Active' },
-  { id: 4, name: 'Ananya Patel', email: 'ananya.p@company.com', role: 'Employee', department: 'Marketing', designation: 'Marketing Lead', employee_code: 'EMP-MKT-009', phone: '+1 555-0133', date_of_joining: '2023-08-01', status: 'Active' },
-  { id: 5, name: 'Vikram Singh', email: 'vikram.s@company.com', role: 'Employee', department: 'Sales', designation: 'Sales Manager', employee_code: 'EMP-SLS-055', phone: '+1 555-0177', date_of_joining: '2023-09-12', status: 'Active' }
-];
+function initMockData() {
+  try {
+    const leaves = localStorage.getItem('mock_hr_leaves');
+    const hrDash = localStorage.getItem('mock_hr_dashboard');
+    const empDash = localStorage.getItem('mock_emp_dashboard');
+    const emps = localStorage.getItem('mock_employees');
+
+    mockHRLeavesList = leaves ? JSON.parse(leaves) : [
+      { id: 201, employee_name: 'Vikram Singh', employee_code: 'EMP-SLS-055', department: 'Sales', leave_type: 'Sick Leave', start_date: '2026-07-22', end_date: '2026-07-23', days_count: 2, reason: 'High fever and doctor consultation', status: 'Pending', applied_at: '2026-07-21', review_notes: '' },
+      { id: 202, employee_name: 'Neha Kapoor', employee_code: 'EMP-MKT-011', department: 'Marketing', leave_type: 'Casual Leave', start_date: '2026-07-25', end_date: '2026-07-26', days_count: 2, reason: 'Family function trip', status: 'Approved', applied_at: '2026-07-20', review_notes: 'Approved. Enjoy your time off.' },
+      { id: 203, employee_name: 'Rahul Verma', employee_code: 'EMP-DES-012', department: 'Product & Design', leave_type: 'Paid Leave', start_date: '2026-08-01', end_date: '2026-08-05', days_count: 5, reason: 'Annual vacation trip', status: 'Pending', applied_at: '2026-07-22', review_notes: '' },
+      { id: 204, employee_name: 'Priya Sharma', employee_code: 'EMP-ENG-042', department: 'Engineering', leave_type: 'Casual Leave', start_date: '2026-06-10', end_date: '2026-06-11', days_count: 2, reason: 'Personal work', status: 'Approved', applied_at: '2026-06-08', review_notes: 'Approved by HR.' },
+      { id: 205, employee_name: 'David Miller', employee_code: 'EMP-FIN-033', department: 'Finance', leave_type: 'Unpaid Leave', start_date: '2026-07-15', end_date: '2026-07-16', days_count: 2, reason: 'Shortage of leave quota', status: 'Rejected', applied_at: '2026-07-12', review_notes: 'Rejected due to month-end financial audit deadlines.' }
+    ];
+
+    mockHRDashboardData = hrDash ? JSON.parse(hrDash) : {
+      metrics: {
+        totalEmployees: 42,
+        presentToday: 38,
+        onLeaveToday: 3,
+        pendingLeaves: 2
+      },
+      recentActivity: [
+        { id: 101, employee_name: 'Priya Sharma', department: 'Engineering', check_in: '09:02 AM', check_out: null, status: 'Present', date: '2026-07-22', employee_code: 'EMP-ENG-042', total_hours: 8 },
+        { id: 102, employee_name: 'Rahul Verma', department: 'Product Design', check_in: '08:55 AM', check_out: null, status: 'Present', date: '2026-07-22', employee_code: 'EMP-DES-012', total_hours: 8 },
+        { id: 103, employee_name: 'Ananya Patel', department: 'Marketing', check_in: '09:15 AM', check_out: null, status: 'Present', date: '2026-07-22', employee_code: 'EMP-MKT-009', total_hours: 7.5 },
+        { id: 104, employee_name: 'Vikram Singh', department: 'Sales', check_in: '--:--', check_out: '--:--', status: 'On Leave', date: '2026-07-22', employee_code: 'EMP-SLS-055', total_hours: 0 }
+      ],
+      recentLeaves: mockHRLeavesList
+    };
+
+    mockEmpDashboardData = empDash ? JSON.parse(empDash) : {
+      profile: {
+        name: 'Priya Sharma',
+        email: 'priya96@gmail.com',
+        employee_code: 'EMP-ENG-042',
+        department: 'Engineering',
+        designation: 'Senior Software Engineer',
+        avatar: ''
+      },
+      todayAttendance: null,
+      leaveStats: {
+        annualQuota: 24,
+        usedDays: 2,
+        remainingBalance: 22
+      },
+      notifications: [
+        { id: 1, title: 'Welcome to Workforce HRMS', message: 'Your employee portal account is active. Use this portal to check in/out and apply for leaves.' }
+      ],
+      myRecentAttendance: [
+        { id: 302, date: '2026-07-22', check_in: '08:58 AM', check_out: '06:05 PM', hours: '9.1 hrs', status: 'Present' },
+        { id: 303, date: '2026-07-21', check_in: '09:05 AM', check_out: '06:10 PM', hours: '9.0 hrs', status: 'Present' }
+      ],
+      myLeaves: [
+        { id: 401, leave_type: 'Casual Leave', start_date: '2026-06-10', end_date: '2026-06-11', days_count: 2, status: 'Approved', reason: 'Personal work', applied_at: '2026-06-08' }
+      ],
+      stats: {
+        annualQuota: 24,
+        usedDays: 2,
+        remainingBalance: 22
+      }
+    };
+
+    mockEmployeesList = emps ? JSON.parse(emps) : [
+      { id: 1, name: 'HR Admin Manager', email: 'hr@company.com', role: 'HR', department: 'Human Resources', designation: 'HR Director', employee_code: 'EMP-HR-001', phone: '+1 555-0199', date_of_joining: '2022-01-10', status: 'Active' },
+      { id: 2, name: 'Priya Sharma', email: 'priya96@gmail.com', role: 'Employee', department: 'Engineering', designation: 'Senior Software Engineer', employee_code: 'EMP-ENG-042', phone: '+1 555-0142', date_of_joining: '2023-03-15', status: 'Active' },
+      { id: 3, name: 'Rahul Verma', email: 'rahul.verma@company.com', role: 'Employee', department: 'Product & Design', designation: 'UI/UX Designer', employee_code: 'EMP-DES-012', phone: '+1 555-0188', date_of_joining: '2023-05-20', status: 'Active' },
+      { id: 4, name: 'Ananya Patel', email: 'ananya.p@company.com', role: 'Employee', department: 'Marketing', designation: 'Marketing Lead', employee_code: 'EMP-MKT-009', phone: '+1 555-0133', date_of_joining: '2023-08-01', status: 'Active' },
+      { id: 5, name: 'Vikram Singh', email: 'vikram.s@company.com', role: 'Employee', department: 'Sales', designation: 'Sales Manager', employee_code: 'EMP-SLS-055', phone: '+1 555-0177', date_of_joining: '2023-09-12', status: 'Active' }
+    ];
+  } catch (e) {
+    console.warn('Failed to parse persistent mock database state:', e);
+  }
+}
+
+// Run state loader
+initMockData();
 
 async function request(endpoint, options = {}) {
   let token = null;
@@ -175,14 +207,98 @@ async function request(endpoint, options = {}) {
     if (endpoint === '/dashboard/hr') return mockHRDashboardData;
     if (endpoint === '/dashboard/employee') return mockEmpDashboardData;
     
+    // Employee Profiles / Self Edit
+    if (endpoint === '/employees/profile/me') {
+      let body = {};
+      try { body = JSON.parse(options.body || '{}'); } catch (e) {}
+      if (body.name) {
+        mockEmpUser.name = body.name;
+        mockEmpUser.employee.name = body.name;
+        mockEmpDashboardData.profile.name = body.name;
+      }
+      if (body.phone) {
+        mockEmpUser.employee.phone = body.phone;
+        mockEmpDashboardData.profile.phone = body.phone;
+      }
+      saveMockData();
+      return { success: true, message: 'Profile updated successfully', employee: mockEmpUser.employee };
+    }
+
+    // Employees Management Actions
     if (endpoint.startsWith('/employees')) {
+      if (options.method === 'POST') {
+        let body = {};
+        try { body = JSON.parse(options.body || '{}'); } catch (e) {}
+        
+        if (endpoint === '/employees') {
+          const newEmp = {
+            id: Date.now(),
+            name: body.name || 'New Employee',
+            email: body.email || '',
+            phone: body.phone || '',
+            role: body.role || 'EMPLOYEE',
+            department: body.department || 'Engineering',
+            designation: body.designation || 'Software Engineer',
+            employee_code: `EMP-GEN-${Math.floor(100 + Math.random() * 900)}`,
+            date_of_joining: body.date_of_joining || new Date().toISOString().split('T')[0],
+            status: 'Active'
+          };
+          mockEmployeesList.unshift(newEmp);
+          mockHRDashboardData.metrics.totalEmployees += 1;
+          saveMockData();
+          return { success: true, message: 'Employee added successfully', employee: newEmp };
+        }
+        
+        if (endpoint === '/employees/bulk') {
+          const list = body.employees || [];
+          const addedList = list.map(item => ({
+            id: Date.now() + Math.random(),
+            name: item.Name || item.name || 'Bulk Staff',
+            email: item.Email || item.email || '',
+            phone: item.Phone || item.phone || '',
+            role: item.Role || item.role || 'EMPLOYEE',
+            department: item.Department || item.department || 'Engineering',
+            designation: item.Designation || item.designation || 'Specialist',
+            employee_code: `EMP-BLK-${Math.floor(100 + Math.random() * 900)}`,
+            date_of_joining: item['Date of Joining'] || item.date_of_joining || new Date().toISOString().split('T')[0],
+            status: 'Active'
+          }));
+          mockEmployeesList.unshift(...addedList);
+          mockHRDashboardData.metrics.totalEmployees += addedList.length;
+          saveMockData();
+          return { success: true, message: `Successfully imported ${addedList.length} employees` };
+        }
+      }
+      
+      if (options.method === 'PUT') {
+        let body = {};
+        try { body = JSON.parse(options.body || '{}'); } catch (e) {}
+        const parts = endpoint.split('/');
+        const empId = parseInt(parts[2]);
+        const empItem = mockEmployeesList.find(e => e.id === empId);
+        if (empItem) {
+          Object.assign(empItem, body);
+          saveMockData();
+        }
+        return { success: true, message: 'Employee details updated' };
+      }
+
+      if (options.method === 'DELETE') {
+        const parts = endpoint.split('/');
+        const empId = parseInt(parts[2]);
+        mockEmployeesList = mockEmployeesList.filter(e => e.id !== empId);
+        mockHRDashboardData.metrics.totalEmployees = Math.max(0, mockHRDashboardData.metrics.totalEmployees - 1);
+        saveMockData();
+        return { success: true, message: 'Employee deleted' };
+      }
+
       return { employees: mockEmployeesList, pagination: { total: mockEmployeesList.length, page: 1, totalPages: 1 } };
     }
     
     // Attendance Endpoints
     if (endpoint === '/attendance/check-in') {
       const now = new Date();
-      const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
       const todayDate = now.toISOString().split('T')[0];
       
       mockEmpDashboardData.todayAttendance = {
@@ -192,7 +308,8 @@ async function request(endpoint, options = {}) {
         check_in: timeString,
         check_out: null,
         total_hours: null,
-        status: 'Present'
+        status: 'Present',
+        checkInTimeRaw: now.getTime() // Raw milliseconds for math
       };
 
       // Add to myRecentAttendance logs
@@ -219,35 +336,63 @@ async function request(endpoint, options = {}) {
       });
 
       mockHRDashboardData.metrics.presentToday += 1;
+      saveMockData();
 
       return { success: true, message: 'Clocked in successfully!' };
     }
 
     if (endpoint === '/attendance/check-out') {
       const now = new Date();
-      const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
       const todayDate = now.toISOString().split('T')[0];
 
+      let totalHours = 8.0; // Fallback default
       if (mockEmpDashboardData.todayAttendance) {
         mockEmpDashboardData.todayAttendance.check_out = timeString;
-        mockEmpDashboardData.todayAttendance.total_hours = 8.5;
+        
+        let rawIn = mockEmpDashboardData.todayAttendance.checkInTimeRaw;
+        if (!rawIn) {
+          try {
+            const checkInStr = mockEmpDashboardData.todayAttendance.check_in;
+            const [time, ampm] = checkInStr.split(' ');
+            let [h, m] = time.split(':').map(Number);
+            if (ampm && ampm.toLowerCase() === 'pm' && h < 12) h += 12;
+            if (ampm && ampm.toLowerCase() === 'am' && h === 12) h = 0;
+            const checkInDate = new Date();
+            checkInDate.setHours(h, m, 0, 0);
+            rawIn = checkInDate.getTime();
+          } catch (err) {
+            console.error('Failed to parse raw clock in time:', err);
+          }
+        }
+
+        if (rawIn) {
+          const diffMs = now.getTime() - rawIn;
+          const diffMinutes = Math.max(0, Math.floor(diffMs / 60000));
+          totalHours = parseFloat((diffMinutes / 60).toFixed(2));
+          if (totalHours <= 0) {
+            totalHours = 0.01; // Minimum non-zero value
+          }
+        }
+        mockEmpDashboardData.todayAttendance.total_hours = totalHours;
       }
 
       // Update in myRecentAttendance
       const log = mockEmpDashboardData.myRecentAttendance.find(l => l.date === todayDate);
       if (log) {
         log.check_out = timeString;
-        log.hours = '8.5 hrs';
+        log.hours = `${totalHours} hrs`;
       }
 
       // Update in global HR Activity
       const hrLog = mockHRDashboardData.recentActivity.find(a => a.employee_code === mockEmpUser.employee_code && a.date === todayDate);
       if (hrLog) {
         hrLog.check_out = timeString;
-        hrLog.total_hours = 8.5;
+        hrLog.total_hours = totalHours;
       }
 
-      return { success: true, message: 'Clocked out successfully!' };
+      saveMockData();
+      return { success: true, message: `Clocked out successfully! (Worked ${totalHours} hrs)` };
     }
 
     if (endpoint === '/attendance/today') {
@@ -285,6 +430,7 @@ async function request(endpoint, options = {}) {
       mockHRLeavesList.unshift(newLeave);
       mockEmpDashboardData.myLeaves.unshift(newLeave);
       mockHRDashboardData.metrics.pendingLeaves += 1;
+      saveMockData();
 
       return { success: true, message: 'Leave application submitted successfully!', leave: newLeave };
     }
@@ -311,9 +457,27 @@ async function request(endpoint, options = {}) {
       const parts = endpoint.split('/');
       const leaveId = parseInt(parts[2]);
       const leaveItem = mockHRLeavesList.find(l => l.id === leaveId);
+      
       if (leaveItem) {
+        const oldStatus = leaveItem.status;
         leaveItem.status = body.status;
         leaveItem.review_notes = body.review_notes || `Marked ${body.status} by HR`;
+        
+        // Update stats if it matches employee demo user (Priya)
+        if (leaveItem.employee_name === mockEmpUser.name) {
+          if (body.status === 'Approved' && oldStatus !== 'Approved') {
+            mockEmpDashboardData.stats.usedDays += leaveItem.days_count;
+            mockEmpDashboardData.stats.remainingBalance = Math.max(0, mockEmpDashboardData.stats.annualQuota - mockEmpDashboardData.stats.usedDays);
+            mockEmpDashboardData.leaveStats = { ...mockEmpDashboardData.stats };
+          }
+        }
+        
+        // Decrement HR Dashboard pending leave count metric
+        if (oldStatus === 'Pending' && body.status !== 'Pending') {
+          mockHRDashboardData.metrics.pendingLeaves = Math.max(0, mockHRDashboardData.metrics.pendingLeaves - 1);
+        }
+        
+        saveMockData();
       }
       return { success: true, message: `Leave request status updated to ${body.status}` };
     }
