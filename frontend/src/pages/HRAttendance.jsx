@@ -3,6 +3,20 @@ import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { Calendar, Filter, Clock, UserCheck } from 'lucide-react';
 
+const formatDate = (dateStr) => {
+  if (!dateStr) return '--';
+  try {
+    const cleanDate = dateStr.includes('T') ? dateStr.split('T')[0] : dateStr;
+    const parts = cleanDate.split('-');
+    if (parts.length === 3) {
+      return `${parts[2]}/${parts[1]}/${parts[0]}`;
+    }
+    return cleanDate;
+  } catch (e) {
+    return dateStr;
+  }
+};
+
 export default function HRAttendance() {
   const { showToast } = useAuth();
   const [attendance, setAttendance] = useState([]);
@@ -78,7 +92,7 @@ export default function HRAttendance() {
 
         {(selectedEmployee || selectedDate) && (
           <button
-            className="btn btn-secondary btn-sm"
+            className="btn btn-secondary"
             onClick={() => { setSelectedEmployee(''); setSelectedDate(''); }}
           >
             Clear Filters
@@ -110,7 +124,7 @@ export default function HRAttendance() {
               ) : attendance.length > 0 ? (
                 attendance.map((row) => (
                   <tr key={row.id}>
-                    <td style={{ fontWeight: 600 }}>{row.date}</td>
+                    <td style={{ fontWeight: 600 }}>{formatDate(row.date)}</td>
                     <td>
                       <span style={{ fontFamily: 'monospace', background: 'var(--bg-input)', padding: '0.2rem 0.4rem', borderRadius: '4px' }}>
                         {row.employee_code}

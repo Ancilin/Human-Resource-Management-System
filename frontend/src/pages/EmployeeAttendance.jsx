@@ -3,6 +3,20 @@ import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { Clock, Calendar } from 'lucide-react';
 
+const formatDate = (dateStr) => {
+  if (!dateStr) return '--';
+  try {
+    const cleanDate = dateStr.includes('T') ? dateStr.split('T')[0] : dateStr;
+    const parts = cleanDate.split('-');
+    if (parts.length === 3) {
+      return `${parts[2]}/${parts[1]}/${parts[0]}`;
+    }
+    return cleanDate;
+  } catch (e) {
+    return dateStr;
+  }
+};
+
 export default function EmployeeAttendance() {
   const { showToast } = useAuth();
   const [history, setHistory] = useState([]);
@@ -48,7 +62,7 @@ export default function EmployeeAttendance() {
               ) : history.length > 0 ? (
                 history.map((row) => (
                   <tr key={row.id}>
-                    <td style={{ fontWeight: 600 }}>{row.date}</td>
+                    <td style={{ fontWeight: 600 }}>{formatDate(row.date)}</td>
                     <td style={{ color: 'var(--color-success)', fontWeight: 600 }}>
                       {row.check_in || '--:--'}
                     </td>

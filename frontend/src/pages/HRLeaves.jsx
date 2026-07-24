@@ -4,6 +4,20 @@ import { useAuth } from '../context/AuthContext';
 import Modal from '../components/Modal';
 import { CheckCircle2, XCircle, Clock, CalendarDays, MessageSquare } from 'lucide-react';
 
+const formatDate = (dateStr) => {
+  if (!dateStr) return '--';
+  try {
+    const cleanDate = dateStr.includes('T') ? dateStr.split('T')[0] : dateStr;
+    const parts = cleanDate.split('-');
+    if (parts.length === 3) {
+      return `${parts[2]}/${parts[1]}/${parts[0]}`;
+    }
+    return cleanDate;
+  } catch (e) {
+    return dateStr;
+  }
+};
+
 export default function HRLeaves() {
   const { showToast } = useAuth();
   const [leaves, setLeaves] = useState([]);
@@ -126,7 +140,7 @@ export default function HRLeaves() {
               ) : displayedLeaves.length > 0 ? (
                 displayedLeaves.map((l) => (
                   <tr key={l.id}>
-                    <td>{l.applied_at ? new Date(l.applied_at).toLocaleDateString() : 'Recent'}</td>
+                    <td>{l.applied_at ? formatDate(l.applied_at) : 'Recent'}</td>
                     <td>
                       <div style={{ display: 'flex', flexDirection: 'column' }}>
                         <span style={{ fontWeight: 600 }}>{l.employee_name}</span>
@@ -141,7 +155,7 @@ export default function HRLeaves() {
                       <div style={{ display: 'flex', flexDirection: 'column' }}>
                         <span style={{ fontWeight: 600 }}>{l.days_count} Day{l.days_count > 1 ? 's' : ''}</span>
                         <span style={{ fontSize: '0.775rem', color: 'var(--text-secondary)' }}>
-                          {l.start_date} to {l.end_date}
+                          {formatDate(l.start_date)} to {formatDate(l.end_date)}
                         </span>
                       </div>
                     </td>
@@ -213,7 +227,7 @@ export default function HRLeaves() {
             <div style={{ marginBottom: '1rem', padding: '0.75rem', background: 'var(--bg-input)', borderRadius: 'var(--radius-md)' }}>
               <p style={{ fontSize: '0.9rem', fontWeight: 600 }}>{selectedLeave.employee_name} ({selectedLeave.leave_type})</p>
               <p style={{ fontSize: '0.825rem', color: 'var(--text-secondary)' }}>
-                {selectedLeave.start_date} to {selectedLeave.end_date} ({selectedLeave.days_count} days)
+                {formatDate(selectedLeave.start_date)} to {formatDate(selectedLeave.end_date)} ({selectedLeave.days_count} days)
               </p>
             </div>
 

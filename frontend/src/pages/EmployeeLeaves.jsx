@@ -4,6 +4,20 @@ import { useAuth } from '../context/AuthContext';
 import Modal from '../components/Modal';
 import { CalendarPlus, CalendarDays, Clock, CheckCircle2 } from 'lucide-react';
 
+const formatDate = (dateStr) => {
+  if (!dateStr) return '--';
+  try {
+    const cleanDate = dateStr.includes('T') ? dateStr.split('T')[0] : dateStr;
+    const parts = cleanDate.split('-');
+    if (parts.length === 3) {
+      return `${parts[2]}/${parts[1]}/${parts[0]}`;
+    }
+    return cleanDate;
+  } catch (e) {
+    return dateStr;
+  }
+};
+
 export default function EmployeeLeaves() {
   const { showToast } = useAuth();
   const [leaves, setLeaves] = useState([]);
@@ -110,12 +124,12 @@ export default function EmployeeLeaves() {
               ) : leaves && leaves.length > 0 ? (
                 leaves.map((l) => (
                   <tr key={l.id}>
-                    <td>{l.applied_at ? new Date(l.applied_at).toLocaleDateString() : 'Recent'}</td>
+                    <td>{l.applied_at ? formatDate(l.applied_at) : 'Recent'}</td>
                     <td>
-                      <span className="badge badge-info">{l.leave_type}</span>
+                       <span className="badge badge-info">{l.leave_type}</span>
                     </td>
                     <td style={{ fontWeight: 600 }}>
-                      {l.start_date} to {l.end_date}
+                      {formatDate(l.start_date)} to {formatDate(l.end_date)}
                     </td>
                     <td>{l.days_count} Day{l.days_count > 1 ? 's' : ''}</td>
                     <td style={{ maxWidth: '220px', whiteSpace: 'normal', fontStyle: 'italic', fontSize: '0.85rem' }}>
