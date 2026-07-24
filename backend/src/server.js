@@ -21,6 +21,24 @@ const PORT = process.env.PORT || 5000;
 
 // Middlewares
 app.use(cors());
+
+// Database Lazy/Serverless Initialization Middleware
+let dbInitialized = false;
+
+app.use(async (req, res, next) => {
+  if (!dbInitialized) {
+    try {
+      console.log('Database lazy initializing connection...');
+      await initDatabase();
+      dbInitialized = true;
+      console.log('Database lazy initialization succeeded.');
+    } catch (err) {
+      console.error('Database lazy initialization failed:', err);
+    }
+  }
+  next();
+});
+
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
@@ -45,22 +63,7 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Database Lazy/Serverless Initialization Middleware
-let dbInitialized = false;
 
-app.use(async (req, res, next) => {
-  if (!dbInitialized) {
-    try {
-      console.log('Database lazy initializing connection...');
-      await initDatabase();
-      dbInitialized = true;
-      console.log('Database lazy initialization succeeded.');
-    } catch (err) {
-      console.error('Database lazy initialization failed:', err);
-    }
-  }
-  next();
-});
 
 // Initialize DB and Start Server locally
 if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
