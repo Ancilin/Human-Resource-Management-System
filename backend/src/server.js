@@ -45,15 +45,36 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Initialize DB and Start Server
-initDatabase()
-  .then(() => {
-    app.listen(PORT, () => {
-      console.log(`=================================`);
-      console.log(`HRMS Backend running on http://localhost:${PORT}`);
-      console.log(`=================================`);
+// Database Lazy/Serverless Initialization Middleware
+let dbInitialized = false;
+
+app.use(async (req, res, next) => {
+  if (!dbInitialized) {
+    try {
+      console.log('Database lazy initializing connection...');
+      await initDatabase();
+      dbInitialized = true;
+      console.log('Database lazy initialization succeeded.');
+    } catch (err) {
+      console.error('Database lazy initialization failed:', err);
+    }
+  }
+  next();
+});
+
+// Initialize DB and Start Server locally
+if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
+  initDatabase()
+    .then(() => {
+      app.listen(PORT, () => {
+        console.log(`=================================`);
+        console.log(`HRMS Backend running on http://localhost:${PORT}`);
+        console.log(`=================================`);
+      });
+    })
+    .catch((err) => {
+      console.error('Failed to initialize database locally:', err);
     });
-  })
-  .catch((err) => {
-    console.error('Failed to initialize database:', err);
-  });
+}
+
+export default app;

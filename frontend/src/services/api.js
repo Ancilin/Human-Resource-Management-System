@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || (window.location.origin.includes('vercel.app') ? '/api' : 'http://localhost:5000/api');
 
 // Declaring user variables as let for persistence loading
 let mockHRUser = {
