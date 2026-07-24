@@ -3,6 +3,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
 import dotenv from 'dotenv';
+import pg from 'pg';
 
 // Load env variables
 dotenv.config();
@@ -17,8 +18,6 @@ if (DATABASE_URL) {
   // ==========================================
   console.log('PostgreSQL DATABASE_URL detected. Connecting to Neon...');
   
-  // Dynamically import pg
-  const { default: pg } = await import('pg');
   const { Pool } = pg;
 
   const pool = new Pool({
