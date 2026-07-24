@@ -199,12 +199,44 @@ async function request(endpoint, options = {}) {
       let body = {};
       try { body = JSON.parse(options.body || '{}'); } catch (e) {}
       const email = (body.email || '').toLowerCase().trim();
-      
-      if (email.includes('hr') || email === 'hr@company.com') {
-        return { token: 'mock_jwt_token_hr_admin_2026', user: mockHRUser };
-      } else {
-        return { token: 'mock_jwt_token_priya_emp_2026', user: mockEmpUser };
+      const password = body.password || '';
+
+      if (email === 'hr@company.com') {
+        if (password === 'hr123543') {
+          return { token: 'mock_jwt_token_hr_admin_2026', user: mockHRUser };
+        } else {
+          throw new Error('Invalid credentials. Password verification failed for HR Admin.');
+        }
       }
+
+      if (email === 'priya96@gmail.com') {
+        if (password === 'Password123!') {
+          return { token: 'mock_jwt_token_priya_emp_2026', user: mockEmpUser };
+        } else {
+          throw new Error('Invalid credentials. Password verification failed for Employee (Priya).');
+        }
+      }
+
+      // Check dynamically created employees
+      const matchEmp = mockEmployeesList.find(e => e.email.toLowerCase() === email);
+      if (matchEmp) {
+        if (password === 'Password123!') {
+          const dynamicUser = {
+            id: matchEmp.id,
+            name: matchEmp.name,
+            email: matchEmp.email,
+            role: matchEmp.role === 'HR' ? 'HR' : 'Employee',
+            department: matchEmp.department,
+            employee_code: matchEmp.employee_code,
+            employee: matchEmp
+          };
+          return { token: `mock_jwt_token_${matchEmp.id}_2026`, user: dynamicUser };
+        } else {
+          throw new Error(`Invalid credentials. Password verification failed for ${matchEmp.name}.`);
+        }
+      }
+
+      throw new Error('Invalid work email address or password. Access Denied.');
     }
 
     if (endpoint === '/auth/me') {
