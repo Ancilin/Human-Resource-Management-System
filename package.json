@@ -7,5 +7,15 @@
     "start:backend": "cd backend && npm start",
     "start:frontend": "cd frontend && npm run dev",
     "dev": "node -e \"const { spawn } = require('child_process'); spawn('npm', ['run', 'dev'], { cwd: './backend', stdio: 'inherit', shell: true }); spawn('npm', ['run', 'dev'], { cwd: './frontend', stdio: 'inherit', shell: true });\""
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^1.4.5-lts.1",
+    "pg": "^8.22.0",
+    "sqlite3": "^5.1.7"
   }
 }
