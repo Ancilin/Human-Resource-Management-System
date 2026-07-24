@@ -576,6 +576,18 @@ export default function EmployeeManagement() {
               </select>
             </div>
           </div>
+
+          <div className="form-group">
+            <label>Login Password</label>
+            <input
+              type="text"
+              className="form-control"
+              required
+              value={formData.password}
+              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+              placeholder="Enter custom login password"
+            />
+          </div>
         </form>
       </Modal>
 
