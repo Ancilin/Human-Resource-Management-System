@@ -164,7 +164,7 @@ async function request(endpoint, options = {}) {
 
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 2500); // 2.5s fast timeout
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout to allow serverless cold starts
     
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
       ...config,
