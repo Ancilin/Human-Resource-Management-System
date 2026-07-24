@@ -15,6 +15,7 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log('Frontend Login submitted:', { email, password });
     if (!email || !password) {
       setError('Please enter work email address and password.');
       return;
@@ -27,6 +28,7 @@ export default function Login() {
         await login(email, password);
       }
     } catch (err) {
+      console.error('Login submit handler caught error:', err);
       setError(err.message || 'Invalid credentials. Please verify your email and password.');
       if (showToast) showToast(err.message || 'Login failed', 'danger');
     } finally {

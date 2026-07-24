@@ -78,7 +78,10 @@ export function AuthProvider({ children }) {
 
   const login = async (email, password) => {
     try {
+      console.log('AuthContext: Attempting login for', email);
       const res = await api.login({ email, password });
+      console.log('AuthContext: API login response success:', { hasToken: !!res?.token, user: res?.user });
+      
       if (res && res.token && res.user) {
         setToken(res.token);
         setUser(res.user);
@@ -92,6 +95,7 @@ export function AuthProvider({ children }) {
         throw new Error('Invalid authentication response');
       }
     } catch (err) {
+      console.error('AuthContext: login function failed:', err);
       showToast(err.message || 'Login failed', 'danger');
       throw err;
     }

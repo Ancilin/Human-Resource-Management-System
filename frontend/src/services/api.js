@@ -201,10 +201,14 @@ async function request(endpoint, options = {}) {
       const email = (body.email || '').toLowerCase().trim();
       const password = body.password || '';
 
+      console.log('api.js mock login handler evaluating:', { email, password });
+
       if (email === 'hr@company.com') {
         if (password === 'hr123543') {
+          console.log('api.js mock login: HR password matches');
           return { token: 'mock_jwt_token_hr_admin_2026', user: mockHRUser };
         } else {
+          console.warn('api.js mock login: HR password MISMATCH');
           throw new Error('Invalid credentials. Password verification failed for HR Admin.');
         }
       }
