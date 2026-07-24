@@ -2,11 +2,12 @@
   "name": "human-resource-management-system",
   "version": "1.0.0",
   "description": "Full-stack Human Resource Management System (HRMS) built with React, Node.js, Express, and SQLite.",
+  "type": "module",
   "scripts": {
     "setup": "cd backend && npm install && cd ../frontend && npm install",
     "start:backend": "cd backend && npm start",
     "start:frontend": "cd frontend && npm run dev",
-    "dev": "node -e \"const { spawn } = require('child_process'); spawn('npm', ['run', 'dev'], { cwd: './backend', stdio: 'inherit', shell: true }); spawn('npm', ['run', 'dev'], { cwd: './frontend', stdio: 'inherit', shell: true });\""
+    "dev": "node dev.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
