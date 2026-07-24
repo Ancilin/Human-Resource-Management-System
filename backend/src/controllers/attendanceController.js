@@ -1,11 +1,17 @@
 import db from '../config/db.js';
 
 function getTodayString() {
-  return new Date().toISOString().split('T')[0];
+  // Get date in Asia/Kolkata (IST) timezone formatted as YYYY-MM-DD
+  const options = { timeZone: 'Asia/Kolkata', year: 'numeric', month: '2-digit', day: '2-digit' };
+  const formatter = new Intl.DateTimeFormat('en-CA', options);
+  return formatter.format(new Date());
 }
 
 function getTimeString() {
-  return new Date().toTimeString().split(' ')[0];
+  // Get time in Asia/Kolkata (IST) timezone formatted as HH:MM:SS (24-hour clock)
+  const options = { timeZone: 'Asia/Kolkata', hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' };
+  const formatter = new Intl.DateTimeFormat('en-US', options);
+  return formatter.format(new Date());
 }
 
 export async function checkIn(req, res) {

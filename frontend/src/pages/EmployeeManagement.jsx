@@ -21,6 +21,20 @@ function getRowVal(row, keys, fallback = '') {
   return fallback;
 }
 
+const formatDate = (dateStr) => {
+  if (!dateStr) return '--';
+  try {
+    const cleanDate = dateStr.includes('T') ? dateStr.split('T')[0] : dateStr;
+    const parts = cleanDate.split('-');
+    if (parts.length === 3) {
+      return `${parts[2]}/${parts[1]}/${parts[0]}`;
+    }
+    return cleanDate;
+  } catch (e) {
+    return dateStr;
+  }
+};
+
 export default function EmployeeManagement() {
   const { showToast } = useAuth();
   const [employees, setEmployees] = useState([]);
@@ -29,6 +43,9 @@ export default function EmployeeManagement() {
   const [department, setDepartment] = useState('');
   const [page, setPage] = useState(1);
   const [pagination, setPagination] = useState({});
+
+  // Selection state for bulk deletion
+  const [selectedIds, setSelectedIds] = useState([]);
 
   // Modal States
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -60,6 +77,7 @@ export default function EmployeeManagement() {
       const list = Array.isArray(res) ? res : (res?.employees || []);
       setEmployees(list);
       setPagination(res?.pagination || {});
+      setSelectedIds([]); // Clear selections on reload/filter
     } catch (err) {
       showToast('Failed to load employees', 'danger');
     } finally {
@@ -118,6 +136,37 @@ export default function EmployeeManagement() {
         fetchEmployees();
       } catch (err) {
         showToast('Failed to delete employee', 'danger');
+      }
+    }
+  };
+
+  const handleSelectAll = (e) => {
+    if (e.target.checked) {
+      setSelectedIds(employees.map(emp => emp.id));
+    } else {
+      setSelectedIds([]);
+    }
+  };
+
+  const handleSelectRow = (id) => {
+    setSelectedIds(prev =>
+      prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
+    );
+  };
+
+  const handleDeleteMultiple = async () => {
+    if (window.confirm(`Are you sure you want to delete the ${selectedIds.length} selected employees?`)) {
+      setLoading(true);
+      try {
+        for (const id of selectedIds) {
+          await api.deleteEmployee(id);
+        }
+        showToast(`Successfully deleted ${selectedIds.length} employees.`, 'success');
+        setSelectedIds([]);
+        fetchEmployees();
+      } catch (err) {
+        showToast('Failed to delete some employees.', 'danger');
+        fetchEmployees();
       }
     }
   };
@@ -242,7 +291,17 @@ export default function EmployeeManagement() {
           </div>
         </div>
 
-        <div style={{ display: 'flex', gap: '0.75rem' }}>
+        <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+          {selectedIds.length > 0 && (
+            <button
+              className="btn btn-danger"
+              onClick={handleDeleteMultiple}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}
+            >
+              <Trash2 size={16} /> Delete Selected ({selectedIds.length})
+            </button>
+          )}
+
           <button
             className="btn btn-secondary"
             onClick={() => { setParsedPreview([]); setFileName(''); setIsBulkModalOpen(true); }}
@@ -266,6 +325,14 @@ export default function EmployeeManagement() {
           <table className="custom-table">
             <thead>
               <tr>
+                <th style={{ width: '40px' }}>
+                  <input
+                    type="checkbox"
+                    checked={employees.length > 0 && selectedIds.length === employees.length}
+                    onChange={handleSelectAll}
+                    style={{ cursor: 'pointer', transform: 'scale(1.2)' }}
+                  />
+                </th>
                 <th>Code</th>
                 <th>Employee Name</th>
                 <th>Contact</th>
@@ -278,11 +345,19 @@ export default function EmployeeManagement() {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan="7" style={{ textAlign: 'center', padding: '2rem' }}>Loading workforce list...</td>
+                  <td colSpan="8" style={{ textAlign: 'center', padding: '2rem' }}>Loading workforce list...</td>
                 </tr>
               ) : employees.length > 0 ? (
                 employees.map((emp) => (
-                  <tr key={emp.id}>
+                  <tr key={emp.id} style={{ background: selectedIds.includes(emp.id) ? 'rgba(99, 102, 241, 0.05)' : 'transparent' }}>
+                    <td>
+                      <input
+                        type="checkbox"
+                        checked={selectedIds.includes(emp.id)}
+                        onChange={() => handleSelectRow(emp.id)}
+                        style={{ cursor: 'pointer', transform: 'scale(1.1)' }}
+                      />
+                    </td>
                     <td>
                       <span style={{ fontFamily: 'monospace', fontWeight: 700, background: 'var(--bg-input)', padding: '0.2rem 0.5rem', borderRadius: '4px' }}>
                         {emp.employee_code}
@@ -301,7 +376,7 @@ export default function EmployeeManagement() {
                         <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{emp.department}</span>
                       </div>
                     </td>
-                    <td>{emp.date_of_joining}</td>
+                     <td>{formatDate(emp.date_of_joining)}</td>
                     <td>
                       <span className={`badge ${emp.status === 'Active' ? 'badge-success' : 'badge-danger'}`}>
                         {emp.status}
@@ -329,7 +404,7 @@ export default function EmployeeManagement() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="7" style={{ textAlign: 'center', padding: '2.5rem', color: 'var(--text-muted)' }}>
+                  <td colSpan="8" style={{ textAlign: 'center', padding: '2.5rem', color: 'var(--text-muted)' }}>
                     No employees matching the selected criteria.
                   </td>
                 </tr>
