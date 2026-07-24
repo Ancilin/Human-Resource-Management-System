@@ -1,9 +1,9 @@
-import sqlite3 from 'sqlite3';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
 import dotenv from 'dotenv';
 import pg from 'pg';
+import { createRequire } from 'module';
 
 // Load env variables
 dotenv.config();
@@ -82,6 +82,9 @@ if (DATABASE_URL) {
   // Local Development SQLite Connection
   // ==========================================
   console.log('No DATABASE_URL found. Falling back to local SQLite...');
+  
+  const require = createRequire(import.meta.url);
+  const sqlite3 = require('sqlite3');
   
   const __filename = fileURLToPath(import.meta.url);
   const __dirname = path.dirname(__filename);
