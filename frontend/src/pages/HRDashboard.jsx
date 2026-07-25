@@ -70,7 +70,7 @@ export default function HRDashboard({ setCurrentTab }) {
       </div>
 
       {/* Metrics Row with 3D Card Hover */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.25rem' }}>
+      <div className="metrics-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.25rem' }}>
         <div className="stat-card-3d">
           <StatCard
             title="Total Workforce"

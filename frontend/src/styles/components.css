@@ -1,7 +1,8 @@
 /* App Layout */
 .app-layout {
   display: flex;
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
   background-color: var(--bg-primary);
 }
 
@@ -10,6 +11,7 @@
   display: flex;
   flex-direction: column;
   min-width: 0;
+  height: 100%;
   overflow-y: auto;
   transition: margin-left var(--transition-normal);
 }
@@ -498,19 +500,141 @@
   transition: width 1s ease-in-out;
 }
 
-/* Responsive Split Screen */
+/* Responsive Layout */
+.app-header {
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+  padding: 1rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 99;
+}
+
+.app-sidebar {
+  width: 260px;
+  background: var(--bg-secondary);
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding: 1.5rem 1rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  transition: transform var(--transition-normal), left var(--transition-normal);
+}
+
+@media (min-width: 1025px) {
+  .app-sidebar {
+    transform: none !important;
+  }
+}
+
 @media (max-width: 1024px) {
   .login-split-container {
     grid-template-columns: 1fr;
+    padding: 1.5rem;
+    min-height: 100vh;
   }
+  
   .login-feature-panel {
     display: none;
   }
+
+  .login-form-panel {
+    padding: 1rem 0;
+  }
+  
+  .mobile-brand-header {
+    display: flex !important;
+  }
+
+  .app-sidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: -260px;
+    height: 100%;
+    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.4);
+    transform: translateX(0);
+  }
+
+  .app-sidebar.open {
+    transform: translateX(260px);
+  }
+
+  .main-content {
+    margin-left: 0 !important;
+  }
+
+  .app-header {
+    padding: 1rem !important;
+  }
+
+  .mobile-nav-toggle {
+    display: inline-flex !important;
+  }
+
+  .header-user-info {
+    display: none !important;
+  }
+
+  .page-container {
+    padding: 1.25rem !important;
+  }
+
   .hr-dashboard-3d-banner {
     grid-template-columns: 1fr;
+    padding: 1.5rem;
+    gap: 1rem;
   }
+
   .banner-3d-img-wrapper {
     display: none;
+  }
+}
+
+/* Mobile Screen Specific Tweaks (max-width: 576px) */
+@media (max-width: 576px) {
+  .custom-table th:nth-child(4),
+  .custom-table td:nth-child(4),
+  .custom-table th:nth-child(6),
+  .custom-table td:nth-child(6) {
+    display: none !important; /* Hide contact info and joining date columns on small screens to fit */
+  }
+  
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+  
+  .page-header h1 {
+    font-size: 1.4rem;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Make metrics grid stackable on extremely small devices */
+  .metrics-grid {
+    grid-template-columns: 1fr !important;
   }
 }
 

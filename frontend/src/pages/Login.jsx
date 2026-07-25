@@ -126,6 +126,33 @@ export default function Login() {
 
       {/* RIGHT PANEL: Form & Login Controls */}
       <div className="login-form-panel">
+        {/* Mobile-only Brand Header */}
+        <div className="mobile-brand-header" style={{
+          display: 'none',
+          alignItems: 'center',
+          gap: '0.75rem',
+          marginBottom: '2rem',
+          justifyContent: 'center'
+        }}>
+          <div style={{
+            width: '40px',
+            height: '40px',
+            borderRadius: '10px',
+            background: 'var(--accent-gradient)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#fff',
+            boxShadow: '0 8px 24px rgba(99, 102, 241, 0.4)'
+          }}>
+            <Building2 size={22} />
+          </div>
+          <div style={{ textAlign: 'left' }}>
+            <h1 style={{ fontSize: '1.25rem', fontWeight: 800, letterSpacing: '-0.02em', color: 'var(--text-primary)' }}>Workforce HRMS</h1>
+            <span style={{ fontSize: '0.725rem', color: 'var(--text-secondary)', fontWeight: 500 }}>Next-Gen Human Capital Operating System</span>
+          </div>
+        </div>
+
         <div className="glass-card" style={{ width: '100%', maxWidth: '440px', padding: '2.5rem 2rem' }}>
           <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
             <h3 style={{ fontSize: '1.65rem', fontWeight: 800, letterSpacing: '-0.02em' }}>Portal Sign In</h3>

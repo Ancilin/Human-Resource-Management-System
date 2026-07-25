@@ -1,8 +1,8 @@
 import React from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Bell, User } from 'lucide-react';
+import { Bell, User, Menu } from 'lucide-react';
 
-export default function Header({ title }) {
+export default function Header({ title, onToggleSidebar }) {
   const { user } = useAuth();
   const emp = user?.employee;
 
@@ -14,18 +14,28 @@ export default function Header({ title }) {
   });
 
   return (
-    <header style={{
-      background: 'var(--bg-secondary)',
-      borderBottom: '1px solid var(--border-color)',
-      padding: '1rem 2rem',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      sticky: 'top'
-    }}>
-      <div>
-        <h2 style={{ fontSize: '1.25rem', fontWeight: 700 }}>{title}</h2>
-        <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{todayString}</span>
+    <header className="app-header">
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+        <button 
+          className="mobile-nav-toggle"
+          onClick={onToggleSidebar}
+          style={{
+            background: 'none',
+            border: 'none',
+            color: 'var(--text-primary)',
+            cursor: 'pointer',
+            padding: '0.25rem',
+            display: 'none',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}
+        >
+          <Menu size={24} />
+        </button>
+        <div>
+          <h2 style={{ fontSize: '1.25rem', fontWeight: 700 }}>{title}</h2>
+          <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{todayString}</span>
+        </div>
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
@@ -50,7 +60,7 @@ export default function Header({ title }) {
               (emp?.name || user?.email || 'U').charAt(0).toUpperCase()
             )}
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <div className="header-user-info" style={{ display: 'flex', flexDirection: 'column' }}>
             <span style={{ fontSize: '0.9rem', fontWeight: 600 }}>{emp?.name || user?.email}</span>
             <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{emp?.designation || user?.role}</span>
           </div>

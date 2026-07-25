@@ -13,7 +13,7 @@ import {
   ShieldAlert
 } from 'lucide-react';
 
-export default function Sidebar({ currentTab, setCurrentTab }) {
+export default function Sidebar({ currentTab, setCurrentTab, isOpen }) {
   const { user, isHR, logout, theme, toggleTheme } = useAuth();
 
   const hrNavItems = [
@@ -32,18 +32,10 @@ export default function Sidebar({ currentTab, setCurrentTab }) {
 
   const navItems = isHR ? hrNavItems : employeeNavItems;
 
+  const navItemsList = navItems;
+
   return (
-    <aside style={{
-      width: '260px',
-      background: 'var(--bg-secondary)',
-      borderRight: '1px solid var(--border-color)',
-      display: 'flex',
-      flexDirection: 'column',
-      minHeight: '100vh',
-      padding: '1.5rem 1rem',
-      position: 'sticky',
-      top: 0
-    }}>
+    <aside className={`app-sidebar ${isOpen ? 'open' : ''}`}>
       {/* Brand Logo */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0 0.5rem 1.5rem 0.5rem', borderBottom: '1px solid var(--border-color)', marginBottom: '1.5rem' }}>
         <div style={{

@@ -85,6 +85,7 @@ function MainApp() {
   const auth = useAuth() || {};
   const { user, token, loading, isHR } = auth;
   const [currentTab, setCurrentTab] = useState('dashboard');
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   if (loading) {
     return (
@@ -163,10 +164,21 @@ function MainApp() {
 
   return (
     <div className="app-layout">
-      <Sidebar currentTab={currentTab} setCurrentTab={setCurrentTab} />
+      {isSidebarOpen && (
+        <div className="sidebar-overlay" onClick={() => setIsSidebarOpen(false)} />
+      )}
+      
+      <Sidebar 
+        currentTab={currentTab} 
+        setCurrentTab={(tab) => { setCurrentTab(tab); setIsSidebarOpen(false); }} 
+        isOpen={isSidebarOpen} 
+      />
 
       <div className="main-content">
-        <Header title={pageTitles[currentTab] || 'HRMS Portal'} />
+        <Header 
+          title={pageTitles[currentTab] || 'HRMS Portal'} 
+          onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} 
+        />
         <main className="page-container">
           {renderContent()}
         </main>
