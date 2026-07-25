@@ -1,5 +1,12 @@
 import db from '../config/db.js';
 
+function getTodayString() {
+  // Get date in Asia/Kolkata (IST) timezone formatted as YYYY-MM-DD
+  const options = { timeZone: 'Asia/Kolkata', year: 'numeric', month: '2-digit', day: '2-digit' };
+  const formatter = new Intl.DateTimeFormat('en-CA', options);
+  return formatter.format(new Date());
+}
+
 export async function applyLeave(req, res) {
   try {
     const employeeId = req.user.employee_id;
@@ -126,7 +133,7 @@ export async function reviewLeave(req, res) {
 
     // If approved, update attendance status if leave encompasses today or current dates
     if (status === 'Approved') {
-      const today = new Date().toISOString().split('T')[0];
+      const today = getTodayString();
       if (today >= leave.start_date && today <= leave.end_date) {
         await db.run(
           `INSERT OR REPLACE INTO attendance (employee_id, date, status, notes)

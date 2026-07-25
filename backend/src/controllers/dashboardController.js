@@ -1,8 +1,15 @@
 import db from '../config/db.js';
 
+function getTodayString() {
+  // Get date in Asia/Kolkata (IST) timezone formatted as YYYY-MM-DD
+  const options = { timeZone: 'Asia/Kolkata', year: 'numeric', month: '2-digit', day: '2-digit' };
+  const formatter = new Intl.DateTimeFormat('en-CA', options);
+  return formatter.format(new Date());
+}
+
 export async function getHRDashboard(req, res) {
   try {
-    const today = new Date().toISOString().split('T')[0];
+    const today = getTodayString();
 
     // 1. Total active employees (excluding HR/Admin)
     const { totalEmployees } = await db.get(
@@ -64,7 +71,7 @@ export async function getEmployeeDashboard(req, res) {
   try {
     const employeeId = req.user.employee_id;
     const userId = req.user.user_id;
-    const today = new Date().toISOString().split('T')[0];
+    const today = getTodayString();
 
     // Today's attendance
     const todayAttendance = await db.get(
