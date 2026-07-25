@@ -6,23 +6,23 @@ export async function getHRDashboard(req, res) {
 
     // 1. Total active employees (excluding HR/Admin)
     const { totalEmployees } = await db.get(
-      `SELECT COUNT(*) as totalEmployees FROM employees e JOIN users u ON e.user_id = u.id WHERE e.status = 'Active' AND u.role = 'EMPLOYEE'`
+      `SELECT COUNT(*) as "totalEmployees" FROM employees e JOIN users u ON e.user_id = u.id WHERE e.status = 'Active' AND u.role = 'EMPLOYEE'`
     );
 
     // 2. Present today count
     const { presentToday } = await db.get(
-      `SELECT COUNT(*) as presentToday FROM attendance WHERE date = ? AND (status = 'Present' OR status = 'Half Day')`,
+      `SELECT COUNT(*) as "presentToday" FROM attendance WHERE date = ? AND (status = 'Present' OR status = 'Half Day')`,
       [today]
     );
 
     // 3. On leave today count
     const { onLeaveToday } = await db.get(
-      `SELECT COUNT(*) as onLeaveToday FROM attendance WHERE date = ? AND status = 'On Leave'`,
+      `SELECT COUNT(*) as "onLeaveToday" FROM attendance WHERE date = ? AND status = 'On Leave'`,
       [today]
     );
 
     // 4. Pending leaves count
-    const { pendingLeaves } = await db.get(`SELECT COUNT(*) as pendingLeaves FROM leaves WHERE status = 'Pending'`);
+    const { pendingLeaves } = await db.get(`SELECT COUNT(*) as "pendingLeaves" FROM leaves WHERE status = 'Pending'`);
 
     // 5. Recent Attendance Logs
     const recentActivity = await db.all(`
