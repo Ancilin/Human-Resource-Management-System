@@ -238,62 +238,6 @@ export default function Login() {
               {loading ? 'Authenticating...' : 'Sign In to Portal'}
             </button>
           </form>
-
-          {/* Quick Demo Presets */}
-          <div style={{ marginTop: '2rem', borderTop: '1px solid var(--border-color)', paddingTop: '1.25rem' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 600, letterSpacing: '0.05em' }}>
-                Quick Demo Presets
-              </span>
-              <span style={{ fontSize: '0.75rem', color: 'var(--accent-primary)', fontWeight: 600 }}>
-                Pass: hr123543
-              </span>
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
-              <button
-                type="button"
-                onClick={() => handleQuickLogin('hr@company.com', 'hr123543')}
-                style={{
-                  padding: '0.65rem 0.75rem',
-                  borderRadius: 'var(--radius-md)',
-                  background: 'rgba(99, 102, 241, 0.12)',
-                  border: '1px solid rgba(99, 102, 241, 0.35)',
-                  color: '#6366f1',
-                  fontSize: '0.8rem',
-                  fontWeight: 600,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.4rem',
-                  justifyContent: 'center',
-                  cursor: 'pointer'
-                }}
-              >
-                <ShieldCheck size={15} /> HR Admin
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleQuickLogin('priya96@gmail.com', 'Password123!')}
-                style={{
-                  padding: '0.65rem 0.75rem',
-                  borderRadius: 'var(--radius-md)',
-                  background: 'rgba(16, 185, 129, 0.12)',
-                  border: '1px solid rgba(16, 185, 129, 0.35)',
-                  color: '#10b981',
-                  fontSize: '0.8rem',
-                  fontWeight: 600,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.4rem',
-                  justifyContent: 'center',
-                  cursor: 'pointer'
-                }}
-              >
-                <UserCheck size={15} /> Employee (Priya)
-              </button>
-            </div>
-          </div>
         </div>
       </div>
     </div>

@@ -317,15 +317,6 @@ export default function EmployeeManagement() {
 
           <button
             className="btn btn-secondary"
-            onClick={handleLoadPresets}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', background: 'rgba(99, 102, 241, 0.1)', color: 'var(--accent-primary)', border: '1px solid rgba(99, 102, 241, 0.2)' }}
-            title="Automatically seed demo employee profiles"
-          >
-            <Zap size={18} /> Load Demo Presets
-          </button>
-
-          <button
-            className="btn btn-secondary"
             onClick={() => { setParsedPreview([]); setFileName(''); setIsBulkModalOpen(true); }}
             title="Upload CSV / Excel File"
           >
