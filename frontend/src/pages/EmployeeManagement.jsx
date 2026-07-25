@@ -111,7 +111,8 @@ export default function EmployeeManagement() {
       department: emp.department,
       designation: emp.designation,
       date_of_joining: emp.date_of_joining,
-      status: emp.status
+      status: emp.status,
+      new_password: ''
     });
     setIsEditModalOpen(true);
   };
@@ -748,6 +749,21 @@ export default function EmployeeManagement() {
                 onChange={(e) => setFormData({ ...formData, designation: e.target.value })}
               />
             </div>
+          </div>
+
+          <div className="form-group">
+            <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+              <span>New Password</span>
+              <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 400 }}>(Leave blank to keep current)</span>
+            </label>
+            <input
+              type="password"
+              className="form-control"
+              value={formData.new_password || ''}
+              onChange={(e) => setFormData({ ...formData, new_password: e.target.value })}
+              placeholder="Enter new password to reset..."
+              autoComplete="new-password"
+            />
           </div>
         </form>
       </Modal>

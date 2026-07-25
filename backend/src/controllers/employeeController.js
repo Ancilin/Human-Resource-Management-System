@@ -166,7 +166,7 @@ export async function createEmployee(req, res) {
 export async function updateEmployee(req, res) {
   try {
     const { id } = req.params;
-    const { name, phone, department, designation, date_of_joining, status } = req.body;
+    const { name, phone, department, designation, date_of_joining, status, new_password } = req.body;
 
     const existing = await db.get(`SELECT * FROM employees WHERE id = ?`, [id]);
     if (!existing) {
@@ -188,11 +188,20 @@ export async function updateEmployee(req, res) {
       ]
     );
 
+    // Update password if provided
+    if (new_password && new_password.trim().length >= 6) {
+      const passwordHash = await bcrypt.hash(new_password.trim(), 10);
+      await db.run(
+        `UPDATE users SET password = ? WHERE id = ?`,
+        [passwordHash, existing.user_id]
+      );
+    }
+
     const updated = await db.get(`SELECT * FROM employees WHERE id = ?`, [id]);
 
     return res.json({
       success: true,
-      message: 'Employee profile updated successfully.',
+      message: new_password ? 'Employee profile and password updated successfully.' : 'Employee profile updated successfully.',
       employee: updated
     });
   } catch (error) {
