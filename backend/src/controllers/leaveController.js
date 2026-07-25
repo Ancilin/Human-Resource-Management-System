@@ -28,6 +28,20 @@ export async function applyLeave(req, res) {
       return res.status(400).json({ success: false, message: 'End date cannot be prior to start date.' });
     }
 
+    // Check for overlapping leaves
+    const overlappingLeave = await db.get(
+      `SELECT id FROM leaves 
+       WHERE employee_id = ? 
+       AND status IN ('Pending', 'Approved')
+       AND start_date <= ? 
+       AND end_date >= ?`,
+      [employeeId, end_date, start_date]
+    );
+
+    if (overlappingLeave) {
+      return res.status(400).json({ success: false, message: 'You already have a Pending or Approved leave request covering these dates.' });
+    }
+
     const diffTime = Math.abs(end - start);
     const daysCount = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
 
