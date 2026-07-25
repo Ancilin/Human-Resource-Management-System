@@ -33,6 +33,7 @@ export default function HRDashboard({ setCurrentTab }) {
   const total = metrics?.totalEmployees || 0;
   const present = metrics?.presentToday || 0;
   const onLeave = metrics?.onLeaveToday || 0;
+  const pendingLeaves = metrics?.pendingLeaves || 0;
 
   const presentPercent = total > 0 ? (present / total) * 100 : 0;
   const leavePercent = total > 0 ? (onLeave / total) * 100 : 0;
