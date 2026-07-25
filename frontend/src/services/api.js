@@ -297,6 +297,26 @@ async function request(endpoint, options = {}) {
           return { success: true, message: 'Employee added successfully', employee: newEmp };
         }
         
+        if (endpoint === '/employees/seed-presets') {
+           const presets = [
+             { id: 1002, name: 'Priya Sharma', email: 'priya96@gmail.com', department: 'Engineering', designation: 'Senior Software Engineer', phone: '+1 (555) 014-2834', date_of_joining: '2023-03-15', employee_code: 'EMP-ENG-042', status: 'Active', role: 'EMPLOYEE' },
+             { id: 1003, name: 'Rahul Verma', email: 'rahul.verma@company.com', department: 'Product & Design', designation: 'UI/UX Designer', phone: '+1 (555) 018-8283', date_of_joining: '2023-05-20', employee_code: 'EMP-DES-012', status: 'Active', role: 'EMPLOYEE' },
+             { id: 1004, name: 'Ananya Patel', email: 'ananya.p@company.com', department: 'Marketing', designation: 'Marketing Lead', phone: '+1 (555) 013-3948', date_of_joining: '2023-08-01', employee_code: 'EMP-MKT-009', status: 'Active', role: 'EMPLOYEE' },
+             { id: 1005, name: 'Vikram Singh', email: 'vikram.s@company.com', department: 'Sales', designation: 'Sales Manager', phone: '+1 (555) 017-7294', date_of_joining: '2023-09-12', employee_code: 'EMP-SLS-055', status: 'Active', role: 'EMPLOYEE' }
+           ];
+
+           let added = 0;
+           for (const item of presets) {
+             if (!mockEmployeesList.some(e => e.email === item.email)) {
+               mockEmployeesList.push(item);
+               added++;
+             }
+           }
+           mockHRDashboardData.metrics.totalEmployees = mockEmployeesList.length;
+           saveMockData();
+           return { success: true, message: `Successfully loaded ${added} demo preset employees.` };
+         }
+
         if (endpoint === '/employees/bulk') {
           const list = body.employees || [];
           const addedList = list.map(item => ({
@@ -566,6 +586,7 @@ export const api = {
   getEmployeeById: (id) => request(`/employees/${id}`),
   createEmployee: (data) => request('/employees', { method: 'POST', body: JSON.stringify(data) }),
   bulkCreateEmployees: (data) => request('/employees/bulk', { method: 'POST', body: JSON.stringify(data) }),
+  seedDemoPresets: () => request('/employees/seed-presets', { method: 'POST' }),
   updateEmployee: (id, data) => request(`/employees/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
   updateSelfProfile: (data) => request('/employees/profile/me', { method: 'PUT', body: JSON.stringify(data) }),
   deleteEmployee: (id) => request(`/employees/${id}`, { method: 'DELETE' }),

@@ -325,3 +325,54 @@ export async function deleteEmployee(req, res) {
   }
 }
 
+export async function seedDemoPresets(req, res) {
+  try {
+    const presets = [
+      { name: 'Priya Sharma', email: 'priya96@gmail.com', department: 'Engineering', designation: 'Senior Software Engineer', phone: '+1 (555) 014-2834', date_of_joining: '2023-03-15', code: 'EMP-ENG-042' },
+      { name: 'Rahul Verma', email: 'rahul.verma@company.com', department: 'Product & Design', designation: 'UI/UX Designer', phone: '+1 (555) 018-8283', date_of_joining: '2023-05-20', code: 'EMP-DES-012' },
+      { name: 'Ananya Patel', email: 'ananya.p@company.com', department: 'Marketing', designation: 'Marketing Lead', phone: '+1 (555) 013-3948', date_of_joining: '2023-08-01', code: 'EMP-MKT-009' },
+      { name: 'Vikram Singh', email: 'vikram.s@company.com', department: 'Sales', designation: 'Sales Manager', phone: '+1 (555) 017-7294', date_of_joining: '2023-09-12', code: 'EMP-SLS-055' }
+    ];
+
+    const defaultPasswordHash = await bcrypt.hash('Password123!', 10);
+    let seededCount = 0;
+
+    for (const item of presets) {
+      // Check if user exists
+      const existingUser = await db.get(`SELECT * FROM users WHERE email = ?`, [item.email]);
+      if (existingUser) continue;
+
+      // Create User
+      const userRes = await db.run(
+        `INSERT INTO users (email, password, role) VALUES (?, ?, 'EMPLOYEE')`,
+        [item.email, defaultPasswordHash]
+      );
+
+      // Create Employee
+      await db.run(
+        `INSERT INTO employees (user_id, employee_code, name, email, phone, department, designation, date_of_joining, status)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'Active')`,
+        [userRes.lastID, item.code, item.name, item.email, item.phone, item.department, item.designation, item.date_of_joining]
+      );
+
+      // Send Welcome Notification
+      await db.run(
+        `INSERT INTO notifications (user_id, title, message) VALUES (?, 'Welcome to HRMS', ?)`,
+        [userRes.lastID, `Welcome to the Workforce. Your account code is ${item.code}`]
+      );
+
+      seededCount++;
+    }
+
+    return res.json({
+      success: true,
+      message: seededCount > 0 
+        ? `Successfully loaded ${seededCount} demo preset employees.` 
+        : 'Demo preset employees are already loaded.'
+    });
+  } catch (error) {
+    console.error('Seed presets error:', error);
+    return res.status(500).json({ success: false, message: 'Failed to seed demo presets.' });
+  }
+}
+

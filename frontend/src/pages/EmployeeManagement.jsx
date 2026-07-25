@@ -3,7 +3,7 @@ import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import Modal from '../components/Modal';
 import * as XLSX from 'xlsx';
-import { UserPlus, Search, Filter, Edit3, Trash2, Mail, Phone, Building, Briefcase, Calendar, FileSpreadsheet, UploadCloud, Download, CheckCircle2, AlertCircle } from 'lucide-react';
+import { UserPlus, Search, Filter, Edit3, Trash2, Mail, Phone, Building, Briefcase, Calendar, FileSpreadsheet, UploadCloud, Download, CheckCircle2, AlertCircle, Zap } from 'lucide-react';
 
 function getRowVal(row, keys, fallback = '') {
   if (!row || typeof row !== 'object') return fallback;
@@ -171,6 +171,19 @@ export default function EmployeeManagement() {
     }
   };
 
+  const handleLoadPresets = async () => {
+    setLoading(true);
+    try {
+      const res = await api.seedDemoPresets();
+      showToast(res.message, 'success');
+      fetchEmployees();
+    } catch (err) {
+      showToast(err.message || 'Failed to load demo presets', 'danger');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // --- Bulk CSV / Excel Upload Handler ---
   const handleDownloadTemplate = () => {
     const csvContent =
@@ -301,6 +314,15 @@ export default function EmployeeManagement() {
               <Trash2 size={16} /> Delete Selected ({selectedIds.length})
             </button>
           )}
+
+          <button
+            className="btn btn-secondary"
+            onClick={handleLoadPresets}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', background: 'rgba(99, 102, 241, 0.1)', color: 'var(--accent-primary)', border: '1px solid rgba(99, 102, 241, 0.2)' }}
+            title="Automatically seed demo employee profiles"
+          >
+            <Zap size={18} /> Load Demo Presets
+          </button>
 
           <button
             className="btn btn-secondary"

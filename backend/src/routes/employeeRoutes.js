@@ -6,7 +6,8 @@ import {
   bulkCreateEmployees,
   updateEmployee,
   updateSelfProfile,
-  deleteEmployee
+  deleteEmployee,
+  seedDemoPresets
 } from '../controllers/employeeController.js';
 import { authenticateToken } from '../middleware/authMiddleware.js';
 import { requireHR } from '../middleware/roleMiddleware.js';
@@ -20,6 +21,7 @@ router.put('/profile/me', updateSelfProfile);
 
 // HR Only endpoints
 router.get('/', requireHR, getAllEmployees);
+router.post('/seed-presets', requireHR, seedDemoPresets);
 router.get('/:id', requireHR, getEmployeeById);
 router.post('/', requireHR, createEmployee);
 router.post('/bulk', requireHR, bulkCreateEmployees);
