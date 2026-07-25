@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { Calendar, Filter, Clock, UserCheck } from 'lucide-react';
+import { formatTimeIST } from '../utils/dateUtils';
 
 const formatDate = (dateStr) => {
   if (!dateStr) return '--';
@@ -133,13 +134,13 @@ export default function HRAttendance() {
                     <td style={{ fontWeight: 600 }}>{row.employee_name}</td>
                     <td>{row.department}</td>
                     <td>
-                      <span style={{ color: 'var(--color-success)', fontWeight: 600 }}>
-                        {row.check_in || '--:--'}
+                      <span style={{ color: row.check_in ? 'var(--color-success)' : 'var(--text-muted)', fontWeight: 500 }}>
+                        {formatTimeIST(row.check_in) || '--:--'}
                       </span>
                     </td>
                     <td>
                       <span style={{ color: row.check_out ? 'var(--color-info)' : 'var(--text-muted)', fontWeight: 500 }}>
-                        {row.check_out || 'In Progress'}
+                        {formatTimeIST(row.check_out) || 'In Progress'}
                       </span>
                     </td>
                     <td>{row.total_hours ? `${row.total_hours} hrs` : '--'}</td>

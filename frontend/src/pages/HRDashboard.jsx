@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import StatCard from '../components/StatCard';
 import { Users, UserCheck, CalendarX, Clock, ArrowRight, UserPlus, CheckCircle2, FileText, Zap } from 'lucide-react';
+import { formatTimeIST } from '../utils/dateUtils';
 
 export default function HRDashboard({ setCurrentTab }) {
   const [data, setData] = useState(null);
@@ -162,8 +163,8 @@ export default function HRDashboard({ setCurrentTab }) {
                     <tr key={log.id}>
                       <td style={{ fontWeight: 600 }}>{log.employee_name}</td>
                       <td>{log.department}</td>
-                      <td>{log.check_in || '--:--'}</td>
-                      <td>{log.check_out || 'Active'}</td>
+                      <td>{formatTimeIST(log.check_in) || '--:--'}</td>
+                      <td>{formatTimeIST(log.check_out) || 'Active'}</td>
                       <td>
                         <span className={`badge ${
                           log.status === 'Present' ? 'badge-success' : log.status === 'On Leave' ? 'badge-warning' : 'badge-danger'

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { Clock, Calendar } from 'lucide-react';
+import { formatTimeIST } from '../utils/dateUtils';
 
 const formatDate = (dateStr) => {
   if (!dateStr) return '--';
@@ -64,10 +65,10 @@ export default function EmployeeAttendance() {
                   <tr key={row.id}>
                     <td style={{ fontWeight: 600 }}>{formatDate(row.date)}</td>
                     <td style={{ color: 'var(--color-success)', fontWeight: 600 }}>
-                      {row.check_in || '--:--'}
+                      {formatTimeIST(row.check_in) || '--:--'}
                     </td>
                     <td style={{ color: row.check_out ? 'var(--color-info)' : 'var(--text-muted)' }}>
-                      {row.check_out || 'In Progress'}
+                      {formatTimeIST(row.check_out) || 'In Progress'}
                     </td>
                     <td>{row.total_hours ? `${row.total_hours} hrs` : '--'}</td>
                     <td>
