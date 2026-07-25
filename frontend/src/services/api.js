@@ -213,11 +213,19 @@ async function request(endpoint, options = {}) {
         }
       }
 
-      if (email === 'priya96@gmail.com') {
+      if (email === 'aancilin54@gmail.com' || email === 'priya96@gmail.com') {
         if (password === 'Password123!') {
+          if (email === 'aancilin54@gmail.com') {
+            mockEmpUser.name = 'Ancilin P G';
+            mockEmpUser.email = 'aancilin54@gmail.com';
+            mockEmpUser.employee.phone = '+91 6374481325';
+            mockEmpUser.employee.employee_code = 'EMP-001';
+            mockEmpUser.employee.department = 'Engineering';
+            mockEmpUser.employee.designation = 'Software Engineer';
+          }
           return { token: 'mock_jwt_token_priya_emp_2026', user: mockEmpUser };
         } else {
-          throw new Error('Invalid credentials. Password verification failed for Employee (Priya).');
+          throw new Error('Invalid credentials. Password verification failed for Employee.');
         }
       }
 
