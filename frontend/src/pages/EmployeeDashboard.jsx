@@ -59,6 +59,22 @@ export default function EmployeeDashboard({ setCurrentTab }) {
   const isCheckedIn = !!todayAttendance?.check_in;
   const isCheckedOut = !!todayAttendance?.check_out;
 
+  // Format a HH:MM:SS string as IST 12-hour AM/PM
+  const formatTimeIST = (timeStr) => {
+    if (!timeStr || timeStr === '--:--') return '--:--';
+    try {
+      // timeStr is like "13:11:16" — treat it as today's time in IST
+      const [hours, minutes, seconds] = timeStr.split(':').map(Number);
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      const h12 = hours % 12 === 0 ? 12 : hours % 12;
+      const mm = String(minutes).padStart(2, '0');
+      const ss = seconds !== undefined ? `:${String(seconds).padStart(2, '0')}` : '';
+      return `${h12}:${mm}${ss} ${ampm}`;
+    } catch {
+      return timeStr;
+    }
+  };
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
       {/* Employee Profile Hero Card */}
@@ -136,14 +152,14 @@ export default function EmployeeDashboard({ setCurrentTab }) {
             <div>
               <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-muted)', uppercase: true, fontWeight: 600 }}>CHECK IN</span>
               <span style={{ fontSize: '1.25rem', fontWeight: 700, color: isCheckedIn ? 'var(--color-success)' : 'var(--text-muted)' }}>
-                {todayAttendance?.check_in || '--:--'}
+                {formatTimeIST(todayAttendance?.check_in) || '--:--'}
               </span>
             </div>
             <div style={{ width: '1px', background: 'var(--border-color)' }}></div>
             <div>
               <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-muted)', uppercase: true, fontWeight: 600 }}>CHECK OUT</span>
               <span style={{ fontSize: '1.25rem', fontWeight: 700, color: isCheckedOut ? 'var(--color-info)' : 'var(--text-muted)' }}>
-                {todayAttendance?.check_out || '--:--'}
+                {formatTimeIST(todayAttendance?.check_out) || '--:--'}
               </span>
             </div>
           </div>
