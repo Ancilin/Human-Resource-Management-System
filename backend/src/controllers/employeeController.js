@@ -1,6 +1,32 @@
 import bcrypt from 'bcryptjs';
 import db from '../config/db.js';
 
+async function getNextEmployeeCode(role) {
+  if (role === 'HR') {
+    const hrEmployees = await db.all("SELECT employee_code FROM employees WHERE employee_code LIKE 'EMP-HR%'");
+    let maxNum = 0;
+    for (const emp of hrEmployees) {
+      const numPart = emp.employee_code.replace('EMP-HR', '');
+      const num = parseInt(numPart, 10);
+      if (!isNaN(num) && num > maxNum) {
+        maxNum = num;
+      }
+    }
+    return `EMP-HR${(maxNum + 1).toString().padStart(3, '0')}`;
+  } else {
+    const regularEmployees = await db.all("SELECT employee_code FROM employees WHERE employee_code LIKE 'EMP-%' AND employee_code NOT LIKE 'EMP-HR%'");
+    let maxNum = 0;
+    for (const emp of regularEmployees) {
+      const numPart = emp.employee_code.replace('EMP-', '');
+      const num = parseInt(numPart, 10);
+      if (!isNaN(num) && num > maxNum) {
+        maxNum = num;
+      }
+    }
+    return `EMP-${(maxNum + 1).toString().padStart(3, '0')}`;
+  }
+}
+
 export async function getAllEmployees(req, res) {
   try {
     const { search = '', department = '', status = '', page = 1, limit = 50 } = req.query;
@@ -109,9 +135,7 @@ export async function createEmployee(req, res) {
     );
 
     // 2. Generate Employee Code
-    const countRes = await db.get(`SELECT COUNT(*) as total FROM employees`);
-    const codeNumber = (countRes.total + 1).toString().padStart(3, '0');
-    const employeeCode = `EMP-${role === 'HR' ? 'HR' : ''}${codeNumber}`;
+    const employeeCode = await getNextEmployeeCode(role);
 
     // 3. Create Employee Profile
     const empRes = await db.run(
@@ -239,6 +263,20 @@ export async function bulkCreateEmployees(req, res) {
     const defaultPasswordHash = await bcrypt.hash('Password123!', 10);
     const today = new Date().toISOString().split('T')[0];
 
+    // Calculate initial max counters for bulk codes
+    let maxEmployeeNum = 0;
+    let maxHRNum = 0;
+    const allCodes = await db.all("SELECT employee_code FROM employees");
+    for (const emp of allCodes) {
+      if (emp.employee_code.startsWith('EMP-HR')) {
+        const num = parseInt(emp.employee_code.replace('EMP-HR', ''), 10);
+        if (!isNaN(num) && num > maxHRNum) maxHRNum = num;
+      } else if (emp.employee_code.startsWith('EMP-')) {
+        const num = parseInt(emp.employee_code.replace('EMP-', ''), 10);
+        if (!isNaN(num) && num > maxEmployeeNum) maxEmployeeNum = num;
+      }
+    }
+
     for (let index = 0; index < employees.length; index++) {
       const item = employees[index];
 
@@ -273,9 +311,14 @@ export async function bulkCreateEmployees(req, res) {
       );
 
       // Generate Code
-      const countRes = await db.get(`SELECT COUNT(*) as total FROM employees`);
-      const codeNumber = (countRes.total + 1).toString().padStart(3, '0');
-      const employeeCode = `EMP-${role === 'HR' ? 'HR' : ''}${codeNumber}`;
+      let employeeCode;
+      if (role === 'HR') {
+        maxHRNum++;
+        employeeCode = `EMP-HR${maxHRNum.toString().padStart(3, '0')}`;
+      } else {
+        maxEmployeeNum++;
+        employeeCode = `EMP-${maxEmployeeNum.toString().padStart(3, '0')}`;
+      }
 
       // Insert Employee Profile
       await db.run(
