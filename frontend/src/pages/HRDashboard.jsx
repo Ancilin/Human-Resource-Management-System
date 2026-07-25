@@ -30,6 +30,12 @@ export default function HRDashboard({ setCurrentTab }) {
   }
 
   const { metrics, recentActivity, recentLeaves } = data || {};
+  const total = metrics?.totalEmployees || 0;
+  const present = metrics?.presentToday || 0;
+  const onLeave = metrics?.onLeaveToday || 0;
+
+  const presentPercent = total > 0 ? (present / total) * 100 : 0;
+  const leavePercent = total > 0 ? (onLeave / total) * 100 : 0;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
@@ -74,7 +80,7 @@ export default function HRDashboard({ setCurrentTab }) {
         <div className="stat-card-3d">
           <StatCard
             title="Total Workforce"
-            value={metrics?.totalEmployees || 0}
+            value={total}
             subtitle="Active registered staff"
             icon={Users}
             color="#6366f1"
@@ -87,39 +93,39 @@ export default function HRDashboard({ setCurrentTab }) {
         <div className="stat-card-3d">
           <StatCard
             title="Present Today"
-            value={metrics?.presentToday || 0}
+            value={present}
             subtitle="Punched in today"
             icon={UserCheck}
             color="#10b981"
           />
           <div className="animated-progress-container">
-            <div className="animated-progress-fill" style={{ width: '92%', background: '#10b981' }}></div>
+            <div className="animated-progress-fill" style={{ width: `${presentPercent}%`, background: '#10b981' }}></div>
           </div>
         </div>
 
         <div className="stat-card-3d">
           <StatCard
             title="On Leave Today"
-            value={metrics?.onLeaveToday || 0}
+            value={onLeave}
             subtitle="Approved leave balance"
             icon={CalendarX}
             color="#f59e0b"
           />
           <div className="animated-progress-container">
-            <div className="animated-progress-fill" style={{ width: '15%', background: '#f59e0b' }}></div>
+            <div className="animated-progress-fill" style={{ width: `${leavePercent}%`, background: '#f59e0b' }}></div>
           </div>
         </div>
 
         <div className="stat-card-3d">
           <StatCard
             title="Pending Requests"
-            value={metrics?.pendingLeaves || 0}
+            value={pendingLeaves}
             subtitle="Requires HR action"
             icon={Clock}
             color="#ef4444"
           />
           <div className="animated-progress-container">
-            <div className="animated-progress-fill" style={{ width: `${Math.min((metrics?.pendingLeaves || 0) * 20, 100)}%`, background: '#ef4444' }}></div>
+            <div className="animated-progress-fill" style={{ width: `${Math.min((pendingLeaves || 0) * 10, 100)}%`, background: '#ef4444' }}></div>
           </div>
         </div>
       </div>
