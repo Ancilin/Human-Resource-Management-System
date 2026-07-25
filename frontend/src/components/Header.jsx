@@ -6,11 +6,12 @@ export default function Header({ title, onToggleSidebar }) {
   const { user } = useAuth();
   const emp = user?.employee;
 
-  const todayString = new Date().toLocaleDateString('en-US', {
+  const todayString = new Date().toLocaleDateString('en-IN', {
     weekday: 'short',
     month: 'short',
     day: 'numeric',
-    year: 'numeric'
+    year: 'numeric',
+    timeZone: 'Asia/Kolkata'
   });
 
   return (
