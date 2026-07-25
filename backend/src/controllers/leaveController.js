@@ -165,3 +165,33 @@ export async function reviewLeave(req, res) {
     return res.status(500).json({ success: false, message: 'Failed to update leave status.' });
   }
 }
+
+export async function clearAllLeaves(req, res) {
+  try {
+    const { status } = req.query;
+
+    if (status && !['Pending', 'Approved', 'Rejected'].includes(status)) {
+      return res.status(400).json({ success: false, message: 'Invalid status filter. Must be Pending, Approved, or Rejected.' });
+    }
+
+    let query = 'DELETE FROM leaves';
+    const params = [];
+
+    if (status) {
+      query += ' WHERE status = ?';
+      params.push(status);
+    }
+
+    await db.run(query, params);
+
+    return res.json({
+      success: true,
+      message: status 
+        ? `All ${status.toLowerCase()} leave requests have been cleared successfully.` 
+        : 'All leave requests have been cleared successfully.'
+    });
+  } catch (error) {
+    console.error('Clear leaves error:', error);
+    return res.status(500).json({ success: false, message: 'Failed to clear leave requests.' });
+  }
+}

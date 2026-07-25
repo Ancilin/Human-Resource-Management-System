@@ -483,6 +483,18 @@ async function request(endpoint, options = {}) {
       return { success: true, message: 'Leave application submitted successfully!', leave: newLeave };
     }
 
+    if (endpoint.startsWith('/leaves/clear-all')) {
+      const url = new URL(`http://localhost${endpoint}`);
+      const statusParam = url.searchParams.get('status');
+      if (statusParam) {
+        mockHRLeavesList = mockHRLeavesList.filter(l => l.status.toLowerCase() !== statusParam.toLowerCase());
+      } else {
+        mockHRLeavesList = [];
+      }
+      saveMockData();
+      return { success: true, message: 'All requested mock leave applications cleared.' };
+    }
+
     if (endpoint === '/leaves/my-leaves') {
       return { leaves: mockEmpDashboardData.myLeaves, stats: mockEmpDashboardData.stats, pagination: { total: mockEmpDashboardData.myLeaves.length } };
     }
@@ -575,7 +587,8 @@ export const api = {
     const query = new URLSearchParams(params).toString();
     return request(`/leaves/all${query ? `?${query}` : ''}`);
   },
-  reviewLeave: (id, data) => request(`/leaves/${id}/review`, { method: 'PUT', body: JSON.stringify(data) })
+  reviewLeave: (id, data) => request(`/leaves/${id}/review`, { method: 'PUT', body: JSON.stringify(data) }),
+  clearAllLeaves: (status) => request(`/leaves/clear-all${status ? `?status=${status}` : ''}`, { method: 'DELETE' })
 };
 
 export default api;

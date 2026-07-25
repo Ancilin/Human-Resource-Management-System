@@ -3,7 +3,8 @@ import {
   applyLeave,
   getMyLeaves,
   getAllLeaves,
-  reviewLeave
+  reviewLeave,
+  clearAllLeaves
 } from '../controllers/leaveController.js';
 import { authenticateToken } from '../middleware/authMiddleware.js';
 import { requireHR } from '../middleware/roleMiddleware.js';
@@ -18,6 +19,7 @@ router.get('/my-leaves', getMyLeaves);
 
 // HR endpoints
 router.get('/all', requireHR, getAllLeaves);
+router.delete('/clear-all', requireHR, clearAllLeaves);
 router.put('/:id/review', requireHR, reviewLeave);
 
 export default router;

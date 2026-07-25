@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import Modal from '../components/Modal';
-import { CheckCircle2, XCircle, Clock, CalendarDays, MessageSquare } from 'lucide-react';
+import { CheckCircle2, XCircle, Clock, CalendarDays, MessageSquare, Trash2 } from 'lucide-react';
 
 const formatDate = (dateStr) => {
   if (!dateStr) return '--';
@@ -79,6 +79,22 @@ export default function HRLeaves() {
     }
   };
 
+  const handleClearAll = async () => {
+    if (!statusTab) return;
+    const confirmClear = window.confirm(
+      `Are you sure you want to clear all ${statusTab.toLowerCase()} leave requests? This action cannot be undone.`
+    );
+    if (!confirmClear) return;
+
+    try {
+      await api.clearAllLeaves(statusTab);
+      setLeaves(prev => prev.filter(l => (l.status || '').toLowerCase() !== statusTab.toLowerCase()));
+      if (showToast) showToast(`All ${statusTab.toLowerCase()} leave requests have been cleared.`, 'success');
+    } catch (err) {
+      if (showToast) showToast(err.message || 'Failed to clear leave requests', 'danger');
+    }
+  };
+
   // Safe client-side tab filter fallback
   const displayedLeaves = leaves.filter(l => {
     if (!statusTab) return true;
@@ -88,32 +104,51 @@ export default function HRLeaves() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
       {/* Status Tabs Bar */}
-      <div className="glass-card" style={{ display: 'flex', gap: '0.75rem', padding: '0.75rem 1rem', flexWrap: 'wrap' }}>
-        {[
-          { id: '', label: 'All Applications' },
-          { id: 'Pending', label: 'Pending Review' },
-          { id: 'Approved', label: 'Approved' },
-          { id: 'Rejected', label: 'Rejected' }
-        ].map((tab) => (
+      <div className="glass-card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem 1rem', flexWrap: 'wrap', gap: '1rem' }}>
+        <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+          {[
+            { id: '', label: 'All Applications' },
+            { id: 'Pending', label: 'Pending Review' },
+            { id: 'Approved', label: 'Approved' },
+            { id: 'Rejected', label: 'Rejected' }
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setStatusTab(tab.id)}
+              style={{
+                padding: '0.55rem 1.15rem',
+                borderRadius: 'var(--radius-md)',
+                fontSize: '0.875rem',
+                fontWeight: 600,
+                cursor: 'pointer',
+                border: statusTab === tab.id ? '1px solid transparent' : '1px solid var(--border-color)',
+                color: statusTab === tab.id ? '#ffffff' : 'var(--text-secondary)',
+                background: statusTab === tab.id ? 'var(--accent-gradient)' : 'var(--bg-input)',
+                boxShadow: statusTab === tab.id ? '0 4px 12px rgba(99, 102, 241, 0.3)' : 'none',
+                transition: 'all var(--transition-fast)'
+              }}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {statusTab && (
           <button
-            key={tab.id}
-            onClick={() => setStatusTab(tab.id)}
+            className="btn btn-danger"
+            onClick={handleClearAll}
             style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
               padding: '0.55rem 1.15rem',
               borderRadius: 'var(--radius-md)',
-              fontSize: '0.875rem',
-              fontWeight: 600,
-              cursor: 'pointer',
-              border: statusTab === tab.id ? '1px solid transparent' : '1px solid var(--border-color)',
-              color: statusTab === tab.id ? '#ffffff' : 'var(--text-secondary)',
-              background: statusTab === tab.id ? 'var(--accent-gradient)' : 'var(--bg-input)',
-              boxShadow: statusTab === tab.id ? '0 4px 12px rgba(99, 102, 241, 0.3)' : 'none',
-              transition: 'all var(--transition-fast)'
+              fontWeight: 600
             }}
           >
-            {tab.label}
+            <Trash2 size={16} /> Clear All
           </button>
-        ))}
+        )}
       </div>
 
       {/* Leaves Queue List */}
