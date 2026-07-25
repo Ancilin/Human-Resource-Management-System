@@ -67,17 +67,11 @@ export async function initDatabase() {
 
   console.log('Database tables verified.');
   await seedInitialData();
-  await populateTodayDemoData();
 }
 
-
-
 async function seedInitialData() {
-  console.log('Verifying HR and Employee records...');
+  console.log('Verifying HR record...');
   const hrPasswordHash = await bcrypt.hash('hr123543', 10);
-  const defaultPasswordHash = await bcrypt.hash('Password123!', 10);
-  const today = new Date().toISOString().split('T')[0];
-  const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
 
   const existingHR = await db.get(`SELECT * FROM users WHERE email = 'hr@company.com'`);
   if (existingHR) {
@@ -87,7 +81,7 @@ async function seedInitialData() {
     return;
   }
 
-  console.log('Seeding initial HR and Employee records...');
+  console.log('Seeding initial HR record...');
 
   // 1. Create HR User
   const hrUserRes = await db.run(
@@ -108,86 +102,6 @@ async function seedInitialData() {
       '2022-01-15'
     ]
   );
-
-  // 2. Create Employee 1
-  const emp1User = await db.run(
-    `INSERT INTO users (email, password, role) VALUES (?, ?, ?)`,
-    ['john.doe@company.com', defaultPasswordHash, 'EMPLOYEE']
-  );
-  const emp1Res = await db.run(
-    `INSERT INTO employees (user_id, employee_code, name, email, phone, department, designation, date_of_joining)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-    [
-      emp1User.lastID,
-      'EMP-1001',
-      'John Doe',
-      'john.doe@company.com',
-      '+1 (555) 234-5678',
-      'Engineering',
-      'Senior Software Engineer',
-      '2023-03-01'
-    ]
-  );
-
-  // 3. Create Employee 2
-  const emp2User = await db.run(
-    `INSERT INTO users (email, password, role) VALUES (?, ?, ?)`,
-    ['jane.smith@company.com', defaultPasswordHash, 'EMPLOYEE']
-  );
-  const emp2Res = await db.run(
-    `INSERT INTO employees (user_id, employee_code, name, email, phone, department, designation, date_of_joining)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-    [
-      emp2User.lastID,
-      'EMP-1002',
-      'Jane Smith',
-      'jane.smith@company.com',
-      '+1 (555) 345-6789',
-      'Product & Design',
-      'UI/UX Designer',
-      '2023-06-15'
-    ]
-  );
-
-  // 4. Create Employee 3
-  const emp3User = await db.run(
-    `INSERT INTO users (email, password, role) VALUES (?, ?, ?)`,
-    ['alex.jones@company.com', defaultPasswordHash, 'EMPLOYEE']
-  );
-  const emp3Res = await db.run(
-    `INSERT INTO employees (user_id, employee_code, name, email, phone, department, designation, date_of_joining)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-    [
-      emp3User.lastID,
-      'EMP-1003',
-      'Alex Jones',
-      'alex.jones@company.com',
-      '+1 (555) 456-7890',
-      'Marketing',
-      'Growth Specialist',
-      '2024-01-10'
-    ]
-  );
-
-  // 5. Seed Attendance
-  await db.run(
-    `INSERT INTO attendance (employee_id, date, check_in, check_out, status, total_hours)
-     VALUES (?, ?, ?, ?, ?, ?)`,
-    [emp1Res.lastID, today, '09:02:15', null, 'Present', 0]
-  );
-  await db.run(
-    `INSERT INTO attendance (employee_id, date, check_in, check_out, status, total_hours)
-     VALUES (?, ?, ?, ?, ?, ?)`,
-    [emp1Res.lastID, yesterday, '08:58:00', '17:30:00', 'Present', 8.5]
-  );
-
-  // 6. Seed Leaves
-  await db.run(
-    `INSERT INTO leaves (employee_id, leave_type, start_date, end_date, days_count, reason, status)
-     VALUES (?, ?, ?, ?, ?, ?, ?)`,
-    [emp3Res.lastID, 'Paid Leave', today, today, 1, 'Family engagement event', 'Approved']
-  );
-
   console.log('Seeding completed successfully!');
 }
 
