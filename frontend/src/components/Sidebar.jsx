@@ -19,7 +19,7 @@ export default function Sidebar({ currentTab, setCurrentTab, isOpen }) {
   const hrNavItems = [
     { id: 'dashboard', label: 'HR Dashboard', icon: LayoutDashboard },
     { id: 'employees', label: 'Employees', icon: Users },
-    { id: 'attendance', label: 'Company Attendance Logs', icon: Clock },
+    { id: 'attendance', label: 'Attendance Logs', icon: Clock },
     { id: 'leaves', label: 'Leave Requests', icon: CalendarDays }
   ];
 

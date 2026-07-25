@@ -172,20 +172,20 @@ export async function getAllAttendance(req, res) {
     const params = [];
 
     if (employee_id) {
-      query += ` AND a.employee_id = ?`;
-      params.push(employee_id);
+      query += ` AND a.employee_id = CAST(? AS INTEGER)`;
+      params.push(parseInt(employee_id, 10));
     }
 
     if (date) {
-      query += ` AND a.date = ?`;
+      query += ` AND a.date = CAST(? AS DATE)`;
       params.push(date);
     } else {
       if (start_date) {
-        query += ` AND a.date >= ?`;
+        query += ` AND a.date >= CAST(? AS DATE)`;
         params.push(start_date);
       }
       if (end_date) {
-        query += ` AND a.date <= ?`;
+        query += ` AND a.date <= CAST(? AS DATE)`;
         params.push(end_date);
       }
     }

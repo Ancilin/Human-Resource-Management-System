@@ -25,7 +25,7 @@ export default function HRAttendance() {
 
   // Filters
   const [selectedEmployee, setSelectedEmployee] = useState('');
-  const [selectedDate, setSelectedDate] = useState('');
+  const [selectedDate, setSelectedDate] = useState(new Date().toLocaleDateString('en-CA'));
 
   useEffect(() => {
     async function loadFilterOptions() {
