@@ -112,13 +112,8 @@ function initMockData() {
       notifications: [
         { id: 1, title: 'Welcome to Workforce HRMS', message: 'Your employee portal account is active. Use this portal to check in/out and apply for leaves.' }
       ],
-      myRecentAttendance: [
-        { id: 302, date: '2026-07-22', check_in: '08:58 AM', check_out: '06:05 PM', hours: '9.1 hrs', status: 'Present' },
-        { id: 303, date: '2026-07-21', check_in: '09:05 AM', check_out: '06:10 PM', hours: '9.0 hrs', status: 'Present' }
-      ],
-      myLeaves: [
-        { id: 401, leave_type: 'Casual Leave', start_date: '2026-06-10', end_date: '2026-06-11', days_count: 2, status: 'Approved', reason: 'Personal work', applied_at: '2026-06-08' }
-      ],
+      myRecentAttendance: [],
+      myLeaves: [],
       stats: {
         annualQuota: 24,
         usedDays: 2,
@@ -130,13 +125,7 @@ function initMockData() {
     mockEmpDashboardData.profile.name = mockEmpUser.name;
     mockEmpDashboardData.profile.phone = mockEmpUser.employee.phone;
 
-    mockEmployeesList = emps ? JSON.parse(emps) : [
-      { id: 1, name: 'HR Admin Manager', email: 'hr@company.com', role: 'HR', department: 'Human Resources', designation: 'HR Director', employee_code: 'EMP-HR-001', phone: '+1 555-0199', date_of_joining: '2022-01-10', status: 'Active' },
-      { id: 2, name: 'Priya Sharma', email: 'priya96@gmail.com', role: 'Employee', department: 'Engineering', designation: 'Senior Software Engineer', employee_code: 'EMP-ENG-042', phone: '+1 555-0142', date_of_joining: '2023-03-15', status: 'Active' },
-      { id: 3, name: 'Rahul Verma', email: 'rahul.verma@company.com', role: 'Employee', department: 'Product & Design', designation: 'UI/UX Designer', employee_code: 'EMP-DES-012', phone: '+1 555-0188', date_of_joining: '2023-05-20', status: 'Active' },
-      { id: 4, name: 'Ananya Patel', email: 'ananya.p@company.com', role: 'Employee', department: 'Marketing', designation: 'Marketing Lead', employee_code: 'EMP-MKT-009', phone: '+1 555-0133', date_of_joining: '2023-08-01', status: 'Active' },
-      { id: 5, name: 'Vikram Singh', email: 'vikram.s@company.com', role: 'Employee', department: 'Sales', designation: 'Sales Manager', employee_code: 'EMP-SLS-055', phone: '+1 555-0177', date_of_joining: '2023-09-12', status: 'Active' }
-    ];
+    mockEmployeesList = emps ? JSON.parse(emps) : [];
   } catch (e) {
     console.warn('Failed to parse persistent mock database state:', e);
   }
